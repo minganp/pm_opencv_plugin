@@ -1,0 +1,55 @@
+group 'com.bowoo.pm_opencv_plugin'
+version '1.0'
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.1.2'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 31
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        minSdkVersion 21
+        externalNativeBuild {
+            cmake {
+                // Enabling exceptions, RTTI
+                // And setting C++ standard version
+                cppFlags '-frtti -fexceptions -std=c++11'
+
+                // Shared runtime for shared libraries
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["libs"]
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+}

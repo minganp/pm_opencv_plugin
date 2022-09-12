@@ -1,0 +1,51 @@
+//
+// Created by Mingan Peng on 9/5/22.
+//
+
+#include <vector>
+#include "michImage.h"
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+uint32_t *
+convertImage(uint8_t *plane0, uint8_t *plane1, uint8_t *plane2, int bytesPerRow, int bytesPerPixel,
+             int width, int height);
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+void convertTestAndroid(
+        uint8_t *plane0,int bytesPerRow0,
+        uint8_t *plane1,int length1,int bytesPerRow1,
+        uint8_t *plane2,int length2,int bytesPerRow2,
+        int width,int height,int orientation,
+        unsigned char *outImage,unsigned int *size);
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+const char *version();
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+void process_image(const char *inputImagePath, const char *outputImagePath);
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+MichRtImgFltFmt * processAndroidImage(Img *img);
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+Plane *createImagePlane() {
+    return (struct Plane *) malloc(sizeof(struct Plane));
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+Img *createImage(){
+    return (struct Img *) malloc(sizeof(struct Img));
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+MichRtImgFltFmt *createRtImgFmt(){
+    return (struct MichRtImgFltFmt *) malloc(sizeof(struct MichRtImgFltFmt));
+}
+//void processAndroidImage2(Img * img,MichRtImgFltFmt * rtImgFltFmt);
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+void processAndroidImage2(Img * img,unsigned char *buf,uint *size);
+//#include "michImage.cpp"
+//#include "converter.cpp"
+#include "native_opencv.cpp"
+#include "processImage.cpp"
+
