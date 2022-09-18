@@ -3,7 +3,17 @@
 //
 
 #include <vector>
+#include <android/log.h>
+
 #include "michImage.h"
+#include "processImage.h"
+#include "roi_mrz_passport.h"
+
+#define  LOG_TAG    "CVPLUGIN"
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+
+using namespace cv;
+using namespace std;
 
 extern "C" __attribute__((visibility("default"))) __attribute__((used))
 uint32_t *
@@ -46,6 +56,10 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used))
 void processAndroidImage2(Img * img,unsigned char *buf,uint *size);
 //#include "michImage.cpp"
 //#include "converter.cpp"
-#include "native_opencv.cpp"
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+MichRtImgFltFmt *getRoiMrzStepByStep(Img *img);
+
+//#include "native_opencv.cpp"
+#include "roi_mrz_passport.cpp"
 #include "processImage.cpp"
 

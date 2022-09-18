@@ -38,3 +38,17 @@ class MichFrameForProcess {
 
   MichFrameForProcess(this.image, this.rotation);
 }
+
+class MRect extends ffi.Struct{
+  @ffi.Int32()
+  external int x;
+
+  @ffi.Int32()
+  external int y;
+
+  @ffi.Int32()
+  external int width;
+
+  @ffi.Int32()
+  external int height;
+}

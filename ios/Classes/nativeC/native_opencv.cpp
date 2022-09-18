@@ -1,8 +1,7 @@
 #include <android/log.h>
 #include <opencv2/opencv.hpp>
 
-#define  LOG_TAG    "CVPLUGIN"
-#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+
 
 using namespace cv;
 using namespace std;
@@ -17,6 +16,7 @@ using namespace std;
         return CV_VERSION;
     }
 
+    //read picture file from hard dis and do some trans and write back to harddisk
     void process_image(const char *inputImagePath, const char *outputImagePath) {
         Mat input = imread(inputImagePath, IMREAD_GRAYSCALE);
         Mat threshed, withContours;

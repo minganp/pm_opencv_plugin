@@ -2,12 +2,15 @@
 // Created by Mingan Peng on 9/9/22.
 //
 
-    cv::Mat genMatAndroid(
-            uint8_t *plane0, int bytesPerRow0,
-            uint8_t *plane1, int length1, int bytesPerRow1,
-            uint8_t *plane2, int length2, int bytesPerRow2,
-            int width, int height, int orientation
-    ) {
+//generate opencv mat with YUV420 plane
+#include <opencv2/opencv.hpp>
+#include "michImage.h"
+
+cv::Mat genMatAndroid(
+        uint8_t *plane0, int bytesPerRow0,
+        uint8_t *plane1, int length1, int bytesPerRow1,
+        uint8_t *plane2, int length2, int bytesPerRow2,
+        int width, int height, int orientation) {
         uint8_t *yPixel = plane0;
         uint8_t *uPixel = plane1;
         uint8_t *vPixel = plane2;
@@ -35,6 +38,8 @@
         return _yuv_rgb_img;
     }
 
+    //generate opencv mat with YUV420 image from flutter
+    // !!!ios still not implement
     cv::Mat prepareMat(Img *img) {
 
         if (img->platform == 0) {
@@ -54,8 +59,7 @@
         throw "Cant parse image data due to the unknown platform";
     }
 
-
-
+    //trans mat to UintList8 for flutter to use by Image.memory.
     MichRtImgFltFmt *mat2MichRtImg(cv::Mat imgMat){
         std::vector<uchar> buf;
         imencode(".jpg", imgMat, buf);
@@ -84,6 +88,8 @@
         //rtImg->size[0]=buf.size();
 
     }
+
+    //trans mat to UintList8 for flutter to use by Image.memory.
 void mat2MichRtImg2(cv::Mat imgMat,uchar *outImg,uint *size){
 
     std::vector<uchar> buf;
@@ -98,7 +104,10 @@ void mat2MichRtImg2(cv::Mat imgMat,uchar *outImg,uint *size){
     size[0]=buf.size();
 
 }
-    MichRtImgFltFmt * processAndroidImage(Img *img) {
+
+//example of simply trans YUV420 image from android to mat and back to UintList8
+// for flutter to use by Image.memory.
+MichRtImgFltFmt * processAndroidImage(Img *img) {
 
         cv::Mat imgMat=prepareMat(img);
         //MichRtImgFltFmt *rtImgFltFmt=createRtImgFmt();
@@ -108,9 +117,11 @@ void mat2MichRtImg2(cv::Mat imgMat,uchar *outImg,uint *size){
         return mat2MichRtImg(imgMat);
         //LOGI("-------native opencv info: return image size: %d",rtImgFltFmt->size[0]);
         //return rtImgFltFmt;
-    }
+}
 
-    void processAndroidImage2(Img * img,uchar *buf,uint *size){
+//example of simply trans YUV420 image from android to mat and back to UintList8
+// for flutter to use by Image.memory.
+void processAndroidImage2(Img * img,uchar *buf,uint *size){
        // LOGI("-------struct address:%d",rtImgFltFmt);
        // LOGI("-------struct img address:%d",rtImgFltFmt->rtImg);
 

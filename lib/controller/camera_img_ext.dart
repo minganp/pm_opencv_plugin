@@ -93,6 +93,7 @@ extension MichImagePointerExt on ffi.Pointer<MichImage>{
   }
 }
 
+//for image back from opencv, can be used by Image.memory() directly
 extension MichImageMemoryPointerExt on ffi.Pointer<MichImageMemory>{
   Uint8List mapImg2UInt8List(){
     late int size;

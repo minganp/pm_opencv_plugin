@@ -19,6 +19,7 @@ typedef ProcessImg = ffi.Pointer<MichImageMemory> Function(ffi.Pointer<MichImage
 
 typedef CProcessImg2 = ffi.Void Function(ffi.Pointer<MichImage>,ffi.Pointer<ffi.Uint8>,ffi.Pointer<ffi.Uint32>);
 typedef ProcessImg2 = void Function(ffi.Pointer<MichImage>,ffi.Pointer<ffi.Uint8>,ffi.Pointer<ffi.Uint32>);
+
 ffi.DynamicLibrary _openDynamicLibrary() {
   if (Platform.isAndroid) {
     return ffi.DynamicLibrary.open('libOpenCV_ffi.so');
@@ -33,6 +34,11 @@ ffi.DynamicLibrary _lib = _openDynamicLibrary();
 final ProcessImg processNativeImg = _lib
     .lookup<ffi.NativeFunction<CProcessImg>>("processAndroidImage")
     .asFunction();
+
+final ProcessImg roiStepByStep = _lib
+    .lookup<ffi.NativeFunction<CProcessImg>>("getRoiMrzStepByStep")
+    .asFunction();
+
 final ProcessImg2 processNativeImg2 = _lib
     .lookup<ffi.NativeFunction<CProcessImg2>>("processAndroidImage2")
     .asFunction();

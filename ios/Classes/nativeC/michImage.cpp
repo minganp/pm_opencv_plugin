@@ -2,7 +2,7 @@
 // Created by Mingan Peng on 9/8/22.
 //
 
-
+#include "michImage.h"
 Plane *createImagePlane() {
     return (struct Plane *) malloc(sizeof(struct Plane));
 }

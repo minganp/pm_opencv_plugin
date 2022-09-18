@@ -26,8 +26,6 @@ class OpenCvFramesHandler extends FrameHandler<Uint8List>{
     final Uint8List imgU8list = await processor.procImgWithOpencv(img);
     resultStreamController.add(imgU8list);
   }
-
-
 }
 
 class OpencvImageProcessor{
@@ -41,7 +39,8 @@ class OpencvImageProcessor{
       //ffi.Pointer<ffi.Uint8> p= malloc.allocate(3*frame.image.width*frame.image.height);
       //ffi.Pointer<ffi.Uint32> s = malloc.allocate(1);
       print('----img raw address: ${imgRaw.address}');
-      ffi.Pointer<MichImageMemory> imgRt=processNativeImg(imgRaw);
+      //ffi.Pointer<MichImageMemory> imgRt=processNativeImg(imgRaw);
+      ffi.Pointer<MichImageMemory> imgRt=roiStepByStep(imgRaw);
       //processNativeImg2(imgRaw,p,s);
       print('----Trans image in ${stopwatch.elapsedMilliseconds} ms');
       stopwatch.stop();

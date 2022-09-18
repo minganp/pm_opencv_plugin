@@ -15,7 +15,7 @@
         return rotatedImageWidth * (y + 1) - (x + 1);
     }
 
-    //convert image plane to UIntList8
+    //convert image plane to UIntList8,this was replaced by
     uint32_t* convertImage(uint8_t *plane0, uint8_t *plane1, uint8_t *plane2, int bytesPerRow, int bytesPerPixel,
                  int width, int height) {
         int hexFF = 255;
@@ -127,7 +127,7 @@ cv::Mat prepareMatIos(uint8_t *plane,
     return mYUV;
 }
 */
-//trans opencv mat to intlist8 for mobile terminal
+//trans opencv mat to intlist8 for mobile terminal to use
 void mat2UIntList8(Mat imgMat,uchar *outImg,uint *size) {
     std::vector<uchar> buf;
     imencode(".jpg", imgMat, buf);
