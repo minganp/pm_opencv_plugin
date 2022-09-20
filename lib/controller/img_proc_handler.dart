@@ -5,7 +5,7 @@ import 'dart:ffi' as ffi;
 import 'package:flutter/foundation.dart';
 import 'package:pm_opencv_plugin/controller/camera_img_ext.dart';
 import 'package:pm_opencv_plugin/model/mich_image_model.dart';
-
+import 'package:pm_opencv_plugin/pm_opencv_plugin.dart';
 import 'image_ffi.dart';
 
 abstract class FrameHandler<T>{
@@ -14,11 +14,11 @@ abstract class FrameHandler<T>{
 }
 
 class OpenCvFramesHandler extends FrameHandler<Uint8List>{
-  OpencvImageProcessor processor;
+  MichProcessor processor = MichProcessor();
   @override
   StreamController<Uint8List> resultStreamController;
 
-  OpenCvFramesHandler(this.processor,this.resultStreamController);
+  OpenCvFramesHandler(this.resultStreamController);
 
   @override
   Future<void> process(MichFrameForProcess img) async{
@@ -28,9 +28,24 @@ class OpenCvFramesHandler extends FrameHandler<Uint8List>{
   }
 }
 
-class OpencvImageProcessor{
+class MrzHandler extends FrameHandler<MrzResult>{
+  MichProcessor processor = MichProcessor();
+  @override
+  StreamController<MrzResult> resultStreamController;
 
-  Future<Uint8List> processFrameAsync(MichFrameForProcess frame) async{
+  MrzHandler(this.resultStreamController);
+
+  @override
+  Future<void> process(MichFrameForProcess img) async{
+    final MrzResult result =  await processor.procImgOcr(img);
+    resultStreamController.add(result);
+  }
+}
+
+class MichProcessor{
+  final _ocrPlugin = PmOpencvPlugin();
+
+  Future<Uint8List> _processFrameAsync(MichFrameForProcess frame) async{
     try{
       final stopwatch = Stopwatch()..start();
       ffi.Pointer<MichImage> imgRaw =
@@ -61,13 +76,35 @@ class OpencvImageProcessor{
     }
     return Uint8List(0);
   }
+  Future<MrzResult> _getMrzInFrame(MichFrameForProcess frame) async{
+    Uint8List imgBytes = await _processFrameAsync(frame);
+    String? text = await _ocrPlugin.imageToText(imgBytes);
+    return MrzResult(imgBytes,text!);
+  }
   Future<Uint8List> procImgWithOpencv(MichFrameForProcess imgForProcess) async{
     if(!imgForProcess.image.isEmpty()){
       return compute(
-          processFrameAsync, imgForProcess
+          _processFrameAsync, imgForProcess
       );
     }else {
       return Uint8List(0);
     }
   }
+
+  Future<MrzResult> procImgOcr(MichFrameForProcess imgForProcess) async {
+    if(!imgForProcess.image.isEmpty()){
+      return compute(
+          _getMrzInFrame, imgForProcess
+      );
+    }else{
+      return MrzResult(Uint8List(0), '');
+    }
+  }
+}
+
+class MrzResult{
+  Uint8List imgBytes;
+  String ocrText;
+
+  MrzResult(this.imgBytes,this.ocrText);
 }

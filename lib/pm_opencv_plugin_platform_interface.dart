@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'pm_opencv_plugin_method_channel.dart';
@@ -25,5 +27,9 @@ abstract class PmOpencvPluginPlatform extends PlatformInterface {
 
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  Future<String?> imageToUTF8Text(Uint8List imgBytes){
+    throw UnimplementedError('imageToText() has not been implemented');
   }
 }

@@ -16,6 +16,7 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }  //for tesseract4Android
     }
 }
 
@@ -51,5 +52,8 @@ android {
         cmake {
             path "CMakeLists.txt"
         }
+    }
+    dependencies {
+        implementation 'cz.adaptech:tesseract4android:4.1.1' //for tesseract4Android
     }
 }

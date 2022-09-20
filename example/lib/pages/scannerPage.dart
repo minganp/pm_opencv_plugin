@@ -7,6 +7,7 @@ import 'package:pm_opencv_plugin/controller/img_proc_handler.dart';
 import 'package:pm_opencv_plugin/convert.dart';
 import 'package:pm_opencv_plugin/model/mich_image_model.dart';
 import 'package:image/image.dart' as img_lib;
+
 class ScannerPage extends StatefulWidget{
   final List<CameraDescription> ?cameras;
   const ScannerPage({Key? key,required this.cameras}) : super(key: key);
@@ -18,10 +19,11 @@ class ScannerPage extends StatefulWidget{
 
 class _ScannerState extends State<ScannerPage>{
   CameraController ?camController;
-  OpencvImageProcessor processor=OpencvImageProcessor();
-  late OpenCvFramesHandler handler;
-  late StreamController<Uint8List> resultStreamController;
-
+  //OpencvImageProcessor processor=OpencvImageProcessor();
+  //late OpenCvFramesHandler handler;
+  late MrzHandler handler;
+  //late StreamController<Uint8List> resultStreamController;
+  late StreamController<MrzResult> mrzStreamController;
   late Timer _timer;
   late bool _isScanBusy;
   late CameraImage _cameraImage;
@@ -29,12 +31,14 @@ class _ScannerState extends State<ScannerPage>{
   late Convert conv;
   late img_lib.Image image;
   late Uint8List imgBytesList;
-  void startListenStream(Stream<Uint8List> stream) async{
+  String? textInImage;
+  void startListenStream(Stream<MrzResult> stream) async{
     await for (final result in stream){
       setState(() {
-        imgBytesList=result;
-        _isScanBusy=false;
-        _isScan=true;
+        imgBytesList = result.imgBytes;
+        _isScanBusy = false;
+        _isScan = true;
+        textInImage = result.ocrText;
       });
     }
   }
@@ -50,10 +54,11 @@ class _ScannerState extends State<ScannerPage>{
       if(!mounted){
         return;
       }
-      resultStreamController = StreamController<Uint8List>();
-      startListenStream(resultStreamController.stream);
-
-      handler=OpenCvFramesHandler(processor, resultStreamController);
+      //resultStreamController = StreamController<Uint8List>();
+      mrzStreamController = StreamController<MrzResult>();
+      startListenStream(mrzStreamController.stream);
+      //handler=OpenCvFramesHandler(processor, resultStreamController);
+      handler = MrzHandler(mrzStreamController);
       setState(() {_isScan=false;});
     });
   }
@@ -74,7 +79,12 @@ class _ScannerState extends State<ScannerPage>{
             Expanded(
               child: /*Image.memory(Uint8List.fromList(img_lib.encodeJpg(image)))*/
                 //Image.memory(Uint8List.fromList(img_lib.encodeJpg(image))),
-                Image.memory(imgBytesList),
+              Column(
+                children: [
+                  Image.memory(imgBytesList),
+                  Text(textInImage!),
+                ],
+              ),
             ):
             Expanded(child: _cameraPreviewWidget()),
           Row(
@@ -88,13 +98,12 @@ class _ScannerState extends State<ScannerPage>{
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: <Widget>[
                 MaterialButton(
-                    child: const Text("Start Scanning"),
                     textColor: Colors.white,
                     color: Colors.blue,
                     onPressed: ()=>_onPressed(),
+                    child: const Text("Start Scanning"),
                 ),
               MaterialButton(
-                child: const Text("Stop Scanning"),
                 textColor: Colors.white,
                 color: Colors.red,
                 onPressed: ()async{
@@ -115,6 +124,7 @@ class _ScannerState extends State<ScannerPage>{
                     await handler.process(_frameForProcess);
                 });
                 },
+                child: const Text("Stop Scanning"),
               ),
             ],
             ),
