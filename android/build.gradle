@@ -16,7 +16,7 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }  //for tesseract4Android
+        //maven { url 'https://jitpack.io' }  //for tesseract4Android
     }
 }
 
@@ -49,11 +49,20 @@ android {
         }
     }
     externalNativeBuild {
+
         cmake {
             path "CMakeLists.txt"
         }
+        /*
+        ndkBuild {
+            path "/Users/minganpeng/flutter-workspace/pm_opencv_plugin/ios/Classes/jni/Android.mk"
+        }
+         */
     }
+    /*
     dependencies {
         implementation 'cz.adaptech:tesseract4android:4.1.1' //for tesseract4Android
     }
+
+     */
 }

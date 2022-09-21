@@ -4,10 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 
-import com.googlecode.tesseract.android.TessBaseAPI;
+//import com.googlecode.tesseract.android.TessBaseAPI;
 import java.io.File;
 
 public class MrzReader {
+    /*
     byte[] _imageBytes;
     TessBaseAPI _tess;
 
@@ -32,4 +33,6 @@ public class MrzReader {
         _tess.recycle();
         return recognizedText;
     }
+    */
+
 }

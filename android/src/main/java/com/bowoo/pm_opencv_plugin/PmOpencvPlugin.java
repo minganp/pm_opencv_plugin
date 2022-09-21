@@ -28,9 +28,9 @@ public class PmOpencvPlugin implements FlutterPlugin, MethodCallHandler {
       result.success("Android " + android.os.Build.VERSION.RELEASE);
     }else if (call.method.equals("imageToUTF8Text")) {
       //argument as image of byte[]
-      mrzReader.setImageBytes(call.argument("imgBytes"));
+      //mrzReader.setImageBytes(call.argument("imgBytes"));
 
-      result.success(mrzReader.imageToText());
+      //result.success(mrzReader.imageToText());
     }
     else {
       result.notImplemented();
