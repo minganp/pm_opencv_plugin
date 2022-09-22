@@ -55,14 +55,14 @@ android {
         }
         /*
         ndkBuild {
-            path "/Users/minganpeng/flutter-workspace/pm_opencv_plugin/ios/Classes/jni/Android.mk"
+            path "../ios/Classes/jni/Android.mk"
         }
-         */
+        */
     }
     /*
     dependencies {
         implementation 'cz.adaptech:tesseract4android:4.1.1' //for tesseract4Android
     }
+    */
 
-     */
 }

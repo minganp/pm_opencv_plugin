@@ -87,7 +87,7 @@ void _apply_threshold(InputArray imgArray,OutputArray outArray) {
         _outArray.col(i) = 0;
     _outArray.copyTo(outArray);
 }
-bool _compareContoursAreas(const vector<Point> _c1,const vector<Point> _c2){
+bool _compareContoursAreas(const std::vector<Point> _c1,const std::vector<Point> _c2){
     double i=abs(contourArea(Mat(_c1)));
     double j=abs(contourArea(Mat(_c2)));
     return i<j;
@@ -100,7 +100,7 @@ void _find_coordinates(InputArray threshImage, InputArray darkImage,Rect *rect) 
     :return: coordinates of the mrz code area
     :rtype: tuple[y, y1, x, x1]
      */
-    vector<vector<Point>> contours;
+    std::vector<std::vector<Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
     findContours(threshImage, contours, hierarchy,RETR_EXTERNAL, CHAIN_APPROX_SIMPLE,Point(0,0));
     LOGI("Found contours: %d",contours.size());

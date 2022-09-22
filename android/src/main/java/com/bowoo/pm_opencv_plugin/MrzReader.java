@@ -22,7 +22,7 @@ public class MrzReader {
 
     public String imageToText() {
         String dataPath = new File(
-                Environment.getExternalStorageDirectory(), "tesseract")
+                Envirpnment.getExternalStorageDirectory(), "tesseract")
                 .getAbsolutePath();
         String lang = "mrz.traineddata";
         Bitmap bitmap = BitmapFactory.decodeByteArray(_imageBytes, 0, _imageBytes.length);

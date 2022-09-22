@@ -12,8 +12,8 @@
 #define  LOG_TAG    "CVPLUGIN"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 
-using namespace cv;
-using namespace std;
+//using namespace cv;
+//using namespace std;
 
 extern "C" __attribute__((visibility("default"))) __attribute__((used))
 uint32_t *
@@ -62,4 +62,5 @@ MichRtImgFltFmt *getRoiMrzStepByStep(Img *img);
 //#include "native_opencv.cpp"
 #include "roi_mrz_passport.cpp"
 #include "processImage.cpp"
+#include "mrz_ocr.cpp"
 
