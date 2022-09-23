@@ -5,8 +5,7 @@ import 'dart:ffi' as ffi;
 import 'package:flutter/foundation.dart';
 import 'package:pm_opencv_plugin/controller/camera_img_ext.dart';
 import 'package:pm_opencv_plugin/model/mich_image_model.dart';
-import 'package:pm_opencv_plugin/pm_opencv_plugin.dart';
-import 'image_ffi.dart';
+import '../controller/image_ffi.dart';
 
 abstract class FrameHandler<T>{
   abstract StreamController<T> resultStreamController;
@@ -43,7 +42,9 @@ class MrzHandler extends FrameHandler<MrzResult>{
 }
 
 class MichProcessor{
-  final _ocrPlugin = PmOpencvPlugin();
+
+  ffi.Pointer<MichImage> _prepareFrame(MichFrameForProcess frame) =>
+      frame.image.toMichImagePointer(frame.rotation);
 
   Future<Uint8List> _processFrameAsync(MichFrameForProcess frame) async{
     try{
@@ -51,8 +52,6 @@ class MichProcessor{
       ffi.Pointer<MichImage> imgRaw =
         frame.image.toMichImagePointer(frame.rotation);
 
-      //ffi.Pointer<ffi.Uint8> p= malloc.allocate(3*frame.image.width*frame.image.height);
-      //ffi.Pointer<ffi.Uint32> s = malloc.allocate(1);
       print('----img raw address: ${imgRaw.address}');
       //ffi.Pointer<MichImageMemory> imgRt=processNativeImg(imgRaw);
       ffi.Pointer<MichImageMemory> imgRt=roiStepByStep(imgRaw);
@@ -102,9 +101,7 @@ class MichProcessor{
   }
 }
 
-class MrzResult{
-  Uint8List imgBytes;
-  String ocrText;
+class ImgProcessor{}
+class RoiProcessor{}
 
-  MrzResult(this.imgBytes,this.ocrText);
-}
+

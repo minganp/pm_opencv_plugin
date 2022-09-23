@@ -59,6 +59,8 @@ void processAndroidImage2(Img * img,unsigned char *buf,uint *size);
 extern "C" __attribute__((visibility("default"))) __attribute__((used))
 MichRtImgFltFmt *getRoiMrzStepByStep(Img *img);
 
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+MrzRoiOCR* getImgMrz(char* trainedPath,char* lang,Img *passportImg)
 //#include "native_opencv.cpp"
 #include "roi_mrz_passport.cpp"
 #include "processImage.cpp"

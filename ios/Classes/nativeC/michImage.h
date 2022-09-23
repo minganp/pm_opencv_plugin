@@ -32,4 +32,8 @@ struct MPoint{
     uint32_t height;
 };
 
+struct MrzRoiOCR{
+    MichRtImgFltFmt *img;
+    char * ocrTxt;
+};
 #endif

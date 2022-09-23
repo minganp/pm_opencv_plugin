@@ -9,6 +9,7 @@ import 'dart:io';
 import '../model/mich_image_model.dart';
 import 'image_ffi.dart';
 
+
 extension CameraImageMichExt on CameraImage {
   bool isEmpty() => planes.any((element) => element.bytes.isEmpty);
 
@@ -116,16 +117,40 @@ extension MichImageMemoryPointerExt on ffi.Pointer<MichImageMemory>{
   void release(){
     var imgP = ref.rtImg;
     var sizeP = ref.rtSize;
-    if(imgP != ffi.nullptr) {
-      if(imgP !=ffi.nullptr) {
-        malloc.free(imgP);
-      }
+    if(imgP !=ffi.nullptr) {
+      malloc.free(imgP);
     }
-    if(sizeP != ffi.nullptr) {
-      if(sizeP !=ffi.nullptr) {
-        malloc.free(sizeP);
-      }
+    if(sizeP !=ffi.nullptr) {
+      malloc.free(sizeP);
     }
     malloc.free(this);
+  }
+}
+
+extension MrzPointerExt on ffi.Pointer<MrzRoiOCR>{
+  MrzResult? mrzIONat2MrzResult(){
+    MrzResult result;
+    try {
+      Uint8List imgBinary = ref.imgMrzRoi.mapImg2UInt8List();
+      String ocrTxt = ref.passportText.toDartString();
+      result = MrzResult(imgBinary, ocrTxt);
+      return result;
+    }catch(e){
+      print(e);
+    }
+    return null;
+  }
+  void release(){
+    var imgPointer = ref.imgMrzRoi;
+    var txtPointer = ref.passportText;
+    if(imgPointer != ffi.nullptr){
+      imgPointer.release();
+    }
+    if(txtPointer != ffi.nullptr){
+      malloc.free(txtPointer);
+    }
+    if(this !=ffi.nullptr){
+      malloc.free(this);
+    }
   }
 }

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:pm_opencv_plugin/controller/img_proc_handler.dart';
+import 'package:pm_opencv_plugin/controller/mix_handler.dart';
 import 'package:pm_opencv_plugin/convert.dart';
 import 'package:pm_opencv_plugin/model/mich_image_model.dart';
 import 'package:image/image.dart' as img_lib;
@@ -21,7 +21,7 @@ class _ScannerState extends State<ScannerPage>{
   CameraController ?camController;
   //OpencvImageProcessor processor=OpencvImageProcessor();
   //late OpenCvFramesHandler handler;
-  late MrzHandler handler;
+  late MrzOcrHandler handler;
   //late StreamController<Uint8List> resultStreamController;
   late StreamController<MrzResult> mrzStreamController;
   late Timer _timer;
@@ -58,7 +58,7 @@ class _ScannerState extends State<ScannerPage>{
       mrzStreamController = StreamController<MrzResult>();
       startListenStream(mrzStreamController.stream);
       //handler=OpenCvFramesHandler(processor, resultStreamController);
-      handler = MrzHandler(mrzStreamController);
+      handler = MrzOcrHandler(mrzStreamController);
       setState(() {_isScan=false;});
     });
   }

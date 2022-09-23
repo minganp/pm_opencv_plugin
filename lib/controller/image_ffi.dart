@@ -20,6 +20,9 @@ typedef ProcessImg = ffi.Pointer<MichImageMemory> Function(ffi.Pointer<MichImage
 typedef CProcessImg2 = ffi.Void Function(ffi.Pointer<MichImage>,ffi.Pointer<ffi.Uint8>,ffi.Pointer<ffi.Uint32>);
 typedef ProcessImg2 = void Function(ffi.Pointer<MichImage>,ffi.Pointer<ffi.Uint8>,ffi.Pointer<ffi.Uint32>);
 
+//input the passport image,get the ocr text back
+typedef CMrzRoiOCR = ffi.Pointer<MrzRoiOCR> Function(ffi.Pointer<MichImage>);
+typedef MrzRoiOcr = ffi.Pointer<MrzRoiOCR> Function(ffi.Pointer<MichImage>);
 ffi.DynamicLibrary _openDynamicLibrary() {
   if (Platform.isAndroid) {
     return ffi.DynamicLibrary.open('libOpenCV_ffi.so');
@@ -55,5 +58,8 @@ final CreateRtImg createRtImg = _lib
     .lookup<ffi.NativeFunction<CCreateRtImg>>("createRtImgFmt")
     .asFunction();
 
+final MrzRoiOcr getPassportOCR = _lib
+    .lookup<ffi.NativeFunction<CMrzRoiOCR>>("getImgMrz")
+    .asFunction();
 
 

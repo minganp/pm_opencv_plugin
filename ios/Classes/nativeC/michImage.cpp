@@ -14,3 +14,6 @@ MichRtImgFltFmt *createRtImgFmt(){
     return (struct MichRtImgFltFmt *) malloc((sizeof(struct MichRtImgFltFmt)));
 }
 
+MrzRoiOCR *createMrzRoiOCR(){
+    return (struct MrzRoiOCR *) malloc((sizeof(struct MrzRoiOCR)));
+}

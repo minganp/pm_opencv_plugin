@@ -1,6 +1,7 @@
 import 'dart:ffi' as ffi;
+import 'dart:typed_data';
 import 'package:camera/camera.dart';
-
+import 'package:ffi/ffi.dart';
 class MichImage extends ffi.Struct{
   external ffi.Pointer<MichImagePlane> plane;
   @ffi.Int32()                //0-IOS,1-Android,
@@ -13,7 +14,7 @@ class MichImage extends ffi.Struct{
   external int rotation;       //rotation degree of image, get from mobile sensor
 
 }
-
+//image of yuv420
 class MichImagePlane extends ffi.Struct{
   external ffi.Pointer<ffi.Uint8> planeData;
   external ffi.Pointer<MichImagePlane> nextPlane;
@@ -32,13 +33,6 @@ class MichImageMemory extends ffi.Struct{
   external ffi.Pointer<ffi.Uint32> rtSize;  //size of image
 }
 
-class MichFrameForProcess {
-  CameraImage image;
-  int rotation;
-
-  MichFrameForProcess(this.image, this.rotation);
-}
-
 class MRect extends ffi.Struct{
   @ffi.Int32()
   external int x;
@@ -51,4 +45,25 @@ class MRect extends ffi.Struct{
 
   @ffi.Int32()
   external int height;
+}
+
+//to accept the analyzed result from native
+class MrzRoiOCR extends ffi.Struct{
+  external ffi.Pointer<MichImageMemory> imgMrzRoi;
+  external ffi.Pointer<Utf8> passportText;
+}
+
+
+//
+class MrzResult{
+  Uint8List imgBytes;
+  String ocrText;
+  late Duration processDur;
+  MrzResult(this.imgBytes,this.ocrText);
+}
+class MichFrameForProcess {
+  CameraImage image;
+  int rotation;
+
+  MichFrameForProcess(this.image, this.rotation);
 }

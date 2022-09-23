@@ -127,6 +127,23 @@ void _find_coordinates(InputArray threshImage, InputArray darkImage,Rect *rect) 
         }
     }
 }
+cv::Mat getMrzRoiMat(Img *img){
+    Mat _resized;
+    Mat _pDark;
+    Mat _pThresh;
+    Mat _pSmoothed;
+    Rect _rect;
+
+    Mat imgMat=prepareMat(img);
+    _resize(imgMat,_resized);
+    smooth(_resized,_pSmoothed);
+    find_dark_regions(_pSmoothed,_pDark);
+    _apply_threshold(_pDark,_pThresh);
+    _find_coordinates(_pThresh,_pSmoothed,&_rect);
+    LOGI("ROI X: %d,ROI Y: %d,ROI W: %d,ROI H: %d",_rect.x,_rect.y,_rect.width,_rect.height);
+
+    return _resized(_rect);
+}
 
 extern "C" __attribute__((visibility("default"))) __attribute__((used))
 MichRtImgFltFmt *getRoiMrzStepByStep(Img *img){
