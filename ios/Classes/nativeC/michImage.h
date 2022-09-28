@@ -10,7 +10,10 @@ struct Plane{
     int bytesPerRow;
     int length;
 };
-
+struct ProcessArgument{
+    const char * trainFileDirectory;
+    const char * trainFile;
+};
 struct Img{
     Plane * plane;
     int platform;
@@ -18,7 +21,10 @@ struct Img{
     int height;
     int orientation;
 };
-
+struct ImgForProcess{
+    Img * img;
+    ProcessArgument * processArgument;
+};
 //return image in UInt8List for flutter Image Widget
 struct MichRtImgFltFmt{
     uint8_t *rtImg;
@@ -34,6 +40,7 @@ struct MPoint{
 
 struct MrzRoiOCR{
     MichRtImgFltFmt *img;
-    char * ocrTxt;
+    const char * ocrTxt;
 };
+
 #endif

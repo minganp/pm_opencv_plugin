@@ -3,9 +3,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:pm_opencv_plugin/controller/mix_handler.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pm_opencv_plugin/controller/img_proc_handler.dart';
 import 'package:pm_opencv_plugin/convert.dart';
-import 'package:pm_opencv_plugin/model/mich_image_model.dart';
+import 'package:pm_opencv_plugin/model/image_model.dart';
 import 'package:image/image.dart' as img_lib;
 
 class ScannerPage extends StatefulWidget{
@@ -23,7 +24,7 @@ class _ScannerState extends State<ScannerPage>{
   //late OpenCvFramesHandler handler;
   late MrzOcrHandler handler;
   //late StreamController<Uint8List> resultStreamController;
-  late StreamController<MrzResult> mrzStreamController;
+  late StreamController<FmMrzOCR> mrzStreamController;
   late Timer _timer;
   late bool _isScanBusy;
   late CameraImage _cameraImage;
@@ -32,7 +33,7 @@ class _ScannerState extends State<ScannerPage>{
   late img_lib.Image image;
   late Uint8List imgBytesList;
   String? textInImage;
-  void startListenStream(Stream<MrzResult> stream) async{
+  void startListenStream(Stream<FmMrzOCR> stream) async{
     await for (final result in stream){
       setState(() {
         imgBytesList = result.imgBytes;
@@ -55,10 +56,10 @@ class _ScannerState extends State<ScannerPage>{
         return;
       }
       //resultStreamController = StreamController<Uint8List>();
-      mrzStreamController = StreamController<MrzResult>();
+      mrzStreamController = StreamController<FmMrzOCR>();
       startListenStream(mrzStreamController.stream);
       //handler=OpenCvFramesHandler(processor, resultStreamController);
-      handler = MrzOcrHandler(mrzStreamController);
+      handler = MrzOcrHandler(resultStreamController: mrzStreamController);
       setState(() {_isScan=false;});
     });
   }
@@ -119,9 +120,19 @@ class _ScannerState extends State<ScannerPage>{
                     //image=camImg2UInt8Img(_cameraImage);
                     //imgBytesList=camImg2UInt8Img2(_cameraImage);
                     int rotation=0;
-                    MichFrameForProcess _frameForProcess =
-                      MichFrameForProcess(_cameraImage, rotation);
-                    await handler.process(_frameForProcess);
+
+                    FmFrameForProcess frameForProcess = FmFrameForProcess(
+                        image: _cameraImage,
+                        rotation: 0,
+                        processArgument: FmProcessArgument(
+                            pMrzTFD:(await getApplicationDocumentsDirectory()).path,
+                            pMrzTF:"mrz.traineddata"
+                        )
+                    );
+                    frameForProcess.image = _cameraImage;
+                    frameForProcess.rotation = rotation;
+                    //FmFrameForProcess(image:_cameraImage, rotation: rotation);
+                    await handler.process(frameForProcess);
                 });
                 },
                 child: const Text("Stop Scanning"),

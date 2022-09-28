@@ -1,0 +1,8 @@
+//
+// Created by Mingan Peng on 9/27/22.
+//
+
+#ifndef PM_OPENCV_PLUGIN_TESSTRAIN_H
+#define PM_OPENCV_PLUGIN_TESSTRAIN_H
+const char* const TRAINPATH = @TRAINDATA_PATH@;
+#endif //PM_OPENCV_PLUGIN_TESSTRAIN_H

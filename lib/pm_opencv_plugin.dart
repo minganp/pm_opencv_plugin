@@ -1,9 +1,25 @@
 
+import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+
 import 'pm_opencv_plugin_platform_interface.dart';
 
 class PmOpencvPlugin{
+  static Future<void> initMrzPlugin()async{
+    //check mrz.trainneddata exists
+    late Directory appDir;
+    await getApplicationDocumentsDirectory().then((dir) => appDir = dir);
+    const String filename = "mrz.traineddata";
+    String destName = '${appDir.path}/$filename';
+    final persistFile = File(destName);
+    if(await persistFile.exists())return;
+    print("----From plugin PmOpencvPlugin: $filename not exist,will copy");
 
+    var bytes = await rootBundle.load('packages/pm_opencv_plugin/assets/ocrTrainedData/$filename');
+    await File(destName).writeAsBytes(bytes.buffer.asUint8List());
+  }
   Future<String?> getPlatformVersion() {
     return PmOpencvPluginPlatform.instance.getPlatformVersion();
   }

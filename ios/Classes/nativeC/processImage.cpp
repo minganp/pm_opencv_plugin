@@ -24,14 +24,13 @@ cv::Mat genMatAndroid(
         memcpy(uv, uPixel, vLen);
         memcpy(uv + uLen, vPixel, vLen);
         cv::Mat mYUV = cv::Mat(height, width, CV_8UC1, yPixel, bytesPerRow0);
-        cv::copyMakeBorder(mYUV, mYUV, 0, height >> 1, 0, 0, BORDER_CONSTANT, 0);
+        cv::copyMakeBorder(mYUV, mYUV, 0, height >> 1, 0, 0, cv::BORDER_CONSTANT, 0);
 
         cv::Mat mUV = cv::Mat((height >> 1), width, CV_8UC1, uv, bytesPerRow0);
-        cv:
-        Mat dst_roi = mYUV(Rect(0, height, width, height >> 1));
+        cv::Mat dst_roi = mYUV(cv::Rect(0, height, width, height >> 1));
         mUV.copyTo(dst_roi);
 
-        cv::cvtColor(mYUV, _yuv_rgb_img, COLOR_YUV2RGBA_NV21, 3);
+        cv::cvtColor(mYUV, _yuv_rgb_img, cv::COLOR_YUV2RGBA_NV21, 3);
 
         //fixMatOrientation(orientation, _yuv_rgb_img);
 
@@ -59,7 +58,7 @@ cv::Mat genMatAndroid(
         throw "Cant parse image data due to the unknown platform";
     }
 
-    //trans mat to UintList8 for flutter to use by Image.memory.
+    //trans mat to UIntList8 for flutter to use by Image.memory.
     MichRtImgFltFmt *mat2MichRtImg(cv::Mat imgMat){
         std::vector<uchar> buf;
         imencode(".jpg", imgMat, buf);

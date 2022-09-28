@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pm_opencv_plugin/pm_opencv_plugin.dart';
 import 'package:pm_opencv_plugin/pm_opencv_plugin_platform_interface.dart';
@@ -10,6 +12,12 @@ class MockPmOpencvPluginPlatform
 
   @override
   Future<String?> getPlatformVersion() => Future.value('42');
+
+  @override
+  Future<String?> imageToUTF8Text(Uint8List imgBytes) {
+    // TODO: implement imageToUTF8Text
+    throw UnimplementedError();
+  }
 }
 
 void main() {

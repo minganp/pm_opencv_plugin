@@ -17,3 +17,10 @@ MichRtImgFltFmt *createRtImgFmt(){
 MrzRoiOCR *createMrzRoiOCR(){
     return (struct MrzRoiOCR *) malloc((sizeof(struct MrzRoiOCR)));
 }
+
+ProcessArgument *createProcessArgumentP(){
+    return (struct ProcessArgument*) malloc((sizeof (struct ProcessArgument)));
+}
+ImgForProcess *createImagePorProcess(){
+    return (struct ImgForProcess*) malloc((sizeof (struct ImgForProcess)));
+}

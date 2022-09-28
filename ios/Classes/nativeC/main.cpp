@@ -7,7 +7,7 @@
 
 #include "michImage.h"
 #include "processImage.h"
-#include "roi_mrz_passport.h"
+//#include "roi_mrz_passport.h"
 
 #define  LOG_TAG    "CVPLUGIN"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
@@ -51,6 +51,17 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used))
 MichRtImgFltFmt *createRtImgFmt(){
     return (struct MichRtImgFltFmt *) malloc(sizeof(struct MichRtImgFltFmt));
 }
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+ProcessArgument *createProcessArgumentP(){
+    return (struct ProcessArgument*) malloc((sizeof (struct ProcessArgument)));
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+ImgForProcess *createImagePorProcess(){
+    return (struct ImgForProcess*) malloc((sizeof (struct ImgForProcess)));
+}
+
+
 //void processAndroidImage2(Img * img,MichRtImgFltFmt * rtImgFltFmt);
 extern "C" __attribute__((visibility("default"))) __attribute__((used))
 void processAndroidImage2(Img * img,unsigned char *buf,uint *size);
@@ -59,8 +70,8 @@ void processAndroidImage2(Img * img,unsigned char *buf,uint *size);
 extern "C" __attribute__((visibility("default"))) __attribute__((used))
 MichRtImgFltFmt *getRoiMrzStepByStep(Img *img);
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used))
-MrzRoiOCR* getImgMrz(char* trainedPath,char* lang,Img *passportImg)
+//extern "C" __attribute__((visibility("default"))) __attribute__((used))
+//MrzRoiOCR* getImgMrz(const char* trainedPath,const char* lang,Img *passportImg);
 //#include "native_opencv.cpp"
 #include "roi_mrz_passport.cpp"
 #include "processImage.cpp"
