@@ -75,7 +75,7 @@ class MrzOcrHandler {
   Future<void> process(FmFrameForProcess frame) async{
     print("----from process: ${frame.rotation}");
     print("----from process: ${frame.image.height}");
-    final trainedDataDir = (await getApplicationDocumentsDirectory()).path;
+    final trainedDataDir = frame.processArgument!.pMrzTFD;
     const trainedFile = "mrz.traineddata";
     if(processArgument==null) {
       frame.processArgument = FmProcessArgument();

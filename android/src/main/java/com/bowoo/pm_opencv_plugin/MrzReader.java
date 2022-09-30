@@ -1,5 +1,7 @@
 package com.bowoo.pm_opencv_plugin;
 
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -20,9 +22,11 @@ public class MrzReader {
         this._imageBytes = imageBytes;
     }
 
-    public String imageToText() {
+    public String imageToText(Context context) {
+        AssetManager assetManager = context.getAssets();
+
         String dataPath = new File(
-                Envirpnment.getExternalStorageDirectory(), "tesseract")
+                Environment.getExternalStorageDirectory(), "tesseract")
                 .getAbsolutePath();
         String lang = "mrz.traineddata";
         Bitmap bitmap = BitmapFactory.decodeByteArray(_imageBytes, 0, _imageBytes.length);
@@ -33,6 +37,6 @@ public class MrzReader {
         _tess.recycle();
         return recognizedText;
     }
-    */
+        */
 
 }

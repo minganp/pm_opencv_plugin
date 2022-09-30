@@ -32,4 +32,22 @@ abstract class PmOpencvPluginPlatform extends PlatformInterface {
   Future<String?> imageToUTF8Text(Uint8List imgBytes){
     throw UnimplementedError('imageToText() has not been implemented');
   }
+
+  Future<PrepareMrzResult> initMrzTrainedData(){
+    throw UnimplementedError('initMrzTrainedData');
+  }
+}
+
+class PrepareMrzResult{
+  final int errCode;
+  final String trainedPath;
+  final String errMsg;
+  PrepareMrzResult(this.errCode,this.trainedPath,this.errMsg);
+  factory  PrepareMrzResult.fromJson(Map<String, dynamic> json){
+    final jsonR = json.cast<String,dynamic>();
+    return PrepareMrzResult(
+        jsonR['errCode'] as int,
+        jsonR['trainedPath'] as String,
+        jsonR['errMsg'] as String);
+  }
 }

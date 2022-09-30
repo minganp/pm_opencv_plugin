@@ -3,15 +3,16 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pm_opencv_plugin/controller/img_proc_handler.dart';
 import 'package:pm_opencv_plugin/convert.dart';
 import 'package:pm_opencv_plugin/model/image_model.dart';
 import 'package:image/image.dart' as img_lib;
+import 'package:pm_opencv_plugin_example/main.dart';
 
 class ScannerPage extends StatefulWidget{
   final List<CameraDescription> ?cameras;
-  const ScannerPage({Key? key,required this.cameras}) : super(key: key);
+  final String ?trainedDataPath;
+  const ScannerPage({Key? key,required this.cameras,required this.trainedDataPath}) : super(key: key);
 
   @override
   _ScannerState  createState()=>_ScannerState();
@@ -125,7 +126,7 @@ class _ScannerState extends State<ScannerPage>{
                         image: _cameraImage,
                         rotation: 0,
                         processArgument: FmProcessArgument(
-                            pMrzTFD:(await getApplicationDocumentsDirectory()).path,
+                            pMrzTFD:widget.trainedDataPath,
                             pMrzTF:"mrz.traineddata"
                         )
                     );

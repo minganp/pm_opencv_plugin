@@ -6,34 +6,27 @@
 #include "roi_mrz_passport.h"
 //#include "tessTrain.h"
 const char * getTextFromMrz(const char *path,const char* lang,cv::Mat roi){
-    LOGI("----Begin to initial TessBaseAPI,path: %s,file: %s", path,lang);
-    LOGI("----width:%d,height:%d,channel:%d",roi.size().width,roi.size().height,roi.channels());
+    //LOGI("----Begin to initial TessBaseAPI,path: %s,file: %s", path,lang);
+    //LOGI("----width:%d,height:%d,channel:%d",roi.size().width,roi.size().height,roi.channels());
     tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
     //api->Init(trainedPath,lang)==-1
-    const char* requiredPath=(std::string(path)+"/").c_str();
-    std::string name=std::string(path)+"/"+std::string(lang);
-    if (FILE *file = fopen(name.c_str(), "r")) {
-        fclose(file);
-        LOGI("file exist: path: %s",requiredPath);
-    } else {
-        LOGI("file not exist： %s",name.c_str());
-    }
-        int i = api->Init(NULL,"mrz");
-    LOGI("----Tesseract init result:%d",i);
+
+    int i = api->Init(path,"mrz");
+    //LOGI("----Tesseract init result:%d",i);
     /*
     if(!api->Init(name.c_str(), "mrz")){
         LOGI("----Could not initialize Tesseract! File:%s",lang);
     }
     */
     api->SetImage(
-            roi.data,
-            roi.cols,
-            roi.rows,
-            4,
-            4*roi.cols);
-    char *outText = api->GetUTF8Text();
+            (uchar *)roi.data,
+            roi.size().width,
+            roi.size().height,
+            roi.channels(),
+            roi.step1());
+    const char *outText = api->GetUTF8Text();
     std::string ot(outText,outText+strlen(outText));
-    LOGI("---From native: Wonderful result: %s",ot.c_str());
+    LOGI("---From native: Wonderful result: %s",outText);
     return outText;
 }
 
