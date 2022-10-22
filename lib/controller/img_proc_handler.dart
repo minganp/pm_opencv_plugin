@@ -3,148 +3,115 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:pm_opencv_plugin/controller/model_extension.dart';
+import 'package:pm_opencv_plugin/controller/processor.dart';
 import 'package:pm_opencv_plugin/model/image_model.dart';
-import 'dart:ffi' as ffi;
-import 'proc_ffi.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:pm_opencv_plugin/model/process_result.dart';
+abstract class Handler <RT>{   //nt for native return type, rt for flutter return type
+  StreamController<IProcessResult<RT>> resultStreamController;
+  late Future<RT?> Function(FmFrameForProcess imgForProcess) processAsync;
+  Handler({required this.resultStreamController});
 
+  IProcessResult<RT> toIProcessResult(RT result);
 
-abstract class CommonProcess <NT,RT>{   //nt for native return type, rt for flutter return type
-  StreamController<RT> resultStreamController;
-  CommonProcess({required this.resultStreamController});
-
-  ffi.Pointer<Fms2nFrameForProcess> _prepareFrameFroProcessPointer(
-      FmFrameForProcess frame) =>
-      frame.toFms2nFrameForProcessPointer();
-
-  Future<RT?> specialProcess(FmFrameForProcess frame){
-    throw UnimplementedError();
-  }
-  Future<RT?> isolateProcess(FmFrameForProcess imgForProcess) async{
+  Future<RT?> isolateProcess(
+      FmFrameForProcess imgForProcess) async
+  {
     if(!imgForProcess.image.isEmpty()){
-      print("----here argument::${imgForProcess.processArgument?.pMrzTFD}");
+      //print("----here argument::${imgForProcess.processArgument?.pMrzTFD}");
       return compute(
-          specialProcess,imgForProcess
+          processAsync,imgForProcess
       );
+    }else {
+      return null;
     }
-    return null;
   }
+  //Should be override by processor if want to prepare argument,or check
+  //the argument flower requirement by processor. If not please throw exception
+  FmProcessArgument? checkProcessArgument(FmProcessArgument? argument);
 
   Future<void> process(FmFrameForProcess frame) async {
-    print("----from process: ${frame.rotation}");
-    print("----from process: ${frame.image.height}");
-
+    try {
+      frame.processArgument = checkProcessArgument(frame.processArgument);
+    }catch(e){
+      throw Exception("ErrCode:-1,Bad Arguments, please check!");
+    }
     try {
       final RT? result = await isolateProcess(frame);
-      if (result != null) resultStreamController.add(result);
-    } catch (e) {
-      print(e);
-    }
-  }
-}
-
-class MrzOcrHandler {
-  FmProcessArgument? processArgument;
-  StreamController<FmMrzOCR> resultStreamController;
-
-  static Future<FmMrzOCR?> specialProcess(FmFrameForProcess frame) async{
-    print("----enter special process");
-    final stopwatch = Stopwatch()..start();
-    try {
-      print("----frame info: ${frame.processArgument?.pMrzTFD}");
-      var imgForProcessP = frame.toFms2nFrameForProcessPointer();//_prepareFrameFroProcessPointer(frame);
-      final mrzNativeResult = ffiGetPassportOCR(imgForProcessP);
-      stopwatch.stop();
-      FmMrzOCR? mrzResult = mrzNativeResult.mrzIONat2MrzResult();
-      mrzResult!.processDur = stopwatch.elapsed;
-      imgForProcessP.release();
-      mrzNativeResult.release();
-      return mrzResult;
-    }catch(e){
-      print(e);
-    }
-    return null;
-  }
-
-  ffi.Pointer<Fms2nFrameForProcess> _prepareFrameFroProcessPointer(
-      FmFrameForProcess frame) =>
-      frame.toFms2nFrameForProcessPointer();
-  MrzOcrHandler({
-      required this.resultStreamController,
-        this.processArgument});
-  Future<void> process(FmFrameForProcess frame) async{
-    print("----from process: ${frame.rotation}");
-    print("----from process: ${frame.image.height}");
-    final trainedDataDir = frame.processArgument!.pMrzTFD;
-    const trainedFile = "mrz.traineddata";
-    if(processArgument==null) {
-      frame.processArgument = FmProcessArgument();
-      frame.processArgument!.pMrzTFD = trainedDataDir;
-      frame.processArgument!.pMrzTF = trainedFile;
-    }else {
-      frame.processArgument = processArgument;
-    }
-    try {
-      final FmMrzOCR? result = await isolateProcess(frame);
       if (result != null) {
-        print("----Wonderful result:${result.ocrText}");
-        resultStreamController.add(result);
+        final r = toIProcessResult(result);
+        print("will add result. ");
+        resultStreamController.add(r);
       }
     } catch (e) {
-      print(e);
+      throw Exception(e);
     }
-  }
-  Future<FmMrzOCR?> isolateProcess(FmFrameForProcess imgForProcess) async{
-    if(!imgForProcess.image.isEmpty()){
-      print("----here argument::${imgForProcess.processArgument?.pMrzTFD}");
-      print("----here argument::${imgForProcess.processArgument?.pMrzTF}");
-      //imgForProcess.toFms2nFrameForProcessPointer();
-      return compute(
-          specialProcess,imgForProcess
-      );
-    }
-    return null;
   }
 }
 
-class PassRoiHandler extends CommonProcess<ffi.Pointer<FmsfnImage>,Uint8List>{
-  PassRoiHandler({required super.resultStreamController});
+class MrzRectHandler extends Handler<FmMrzOCR2> {
+  MrzRectHandler({required super.resultStreamController}) {
+    processAsync = mrzRoiProcess;
+  }
+  @override
+  toIProcessResult(FmMrzOCR2 result) {
+    IProcessResult<FmMrzOCR2> tResult = IProcessResult<FmMrzOCR2>();
+    tResult.errCode = result.errCode;
+    tResult.result = result;
+    return tResult;
+  }
 
   @override
-  Future<Uint8List?> specialProcess(FmFrameForProcess frame) async{
-    final stopwatch = Stopwatch()..start();
-    try{
-      var imgForProcessP = _prepareFrameFroProcessPointer(frame);
-      final nativeResult = ffiRoiStepByStep(imgForProcessP);
-      stopwatch.stop();
-      Uint8List rtImg = nativeResult.mapImg2UInt8List();
-      imgForProcessP.release();
-      nativeResult.release();
-      return rtImg;
-    }catch(e){
-      print(e);
+  FmProcessArgument checkProcessArgument(
+      FmProcessArgument? argument) {
+    //"mrz.traineddata"
+    if (argument == null || argument.pMrzTFD == null ||
+        argument.pMrzTF == null) {
+      throw Exception("Bad Trained data, please check");
     }
-    return null;
+    return argument;
   }
 }
 
-class SimpleImgTrans extends CommonProcess<ffi.Pointer<FmsfnImage>,Uint8List>{
-  SimpleImgTrans({required super.resultStreamController});
+class MrzOcrHandler extends Handler<FmMrzOCR> {
+  MrzOcrHandler({required super.resultStreamController}){
+    processAsync = mrzOcrProcessor;
+  }
 
   @override
-  Future<Uint8List?> specialProcess(FmFrameForProcess frame) async{
-    final stopwatch = Stopwatch()..start();
-    try{
-      var imgForProcessP = _prepareFrameFroProcessPointer(frame);
-      final nativeResult = ffiProcessImg(imgForProcessP);
-      stopwatch.stop();
-      Uint8List rtImg = nativeResult.mapImg2UInt8List();
-      imgForProcessP.release();
-      nativeResult.release();
-      return rtImg;
-    }catch(e){
-      print(e);
+  IProcessResult<FmMrzOCR> toIProcessResult(FmMrzOCR result) {
+    // TODO: implement toIProcessResult
+    IProcessResult<FmMrzOCR> tResult = IProcessResult<FmMrzOCR>();
+    tResult.errCode = 0;
+    tResult.result = result;
+    return tResult;
+  }
+
+  @override
+  FmProcessArgument checkProcessArgument(
+      FmProcessArgument? argument) {
+    //"mrz.traineddata"
+    if (argument == null || argument.pMrzTFD == null ||
+        argument.pMrzTF == null) {
+      throw Exception("Bad Trained data, please check");
     }
-    return null;
+    return argument;
+  }
+}
+
+class SimpleImgTrans extends Handler<Uint8List>{
+  SimpleImgTrans({required super.resultStreamController}){
+   //processAsync = simpleProcessor;
+  }
+
+  @override
+  IProcessResult<Uint8List> toIProcessResult(Uint8List result) {
+    // TODO: implement toIProcessResult
+    throw UnimplementedError();
+  }
+
+  @override
+  FmProcessArgument? checkProcessArgument(FmProcessArgument? argument) {
+    // TODO: implement checkProcessArgument
+    throw UnimplementedError();
   }
 }

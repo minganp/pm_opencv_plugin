@@ -9,6 +9,7 @@
  */
 
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 
@@ -18,6 +19,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:ffi' as ffi;
 import '../model/image_model.dart';
 import 'package:pm_opencv_plugin/controller/proc_ffi.dart';
+import 'package:pm_opencv_plugin/mrz_parser-master/lib/mrz_parser.dart';
 
 extension Ep2nImagePointerExt on ffi.Pointer<Fms2nImage>{
   void release(){
@@ -51,7 +53,6 @@ extension EpfnImage on ffi.Pointer<FmsfnImage>{
     late int size;
     late Uint8List image;
     try {
-
       size = ref.rtSize[0];
       if (kDebugMode) {
         print("--------from img_proc_handler. returned image size:$size");
@@ -78,13 +79,31 @@ extension EpfnImage on ffi.Pointer<FmsfnImage>{
   }
 }
 extension EpfnMrzOCR on ffi.Pointer<FmsfnMrzOCR>{
-  FmMrzOCR? mrzIONat2MrzResult(){
-    FmMrzOCR result;
+  Future<FmMrzOCR?> mrzROINat2MrzResult() async{
+    MRZResult? result;
     try {
+      print("before to image int8list");
       Uint8List imgBinary = ref.imgMrzRoi.mapImg2UInt8List();
-      String ocrTxt = ref.passportText.toDartString();
-      result = FmMrzOCR(imgBinary, ocrTxt);
-      return result;
+      var ocrTxt = ref.passportText.toDartString();
+      if(ocrTxt.endsWith("\n")) ocrTxt = ocrTxt.substring(0,ocrTxt.length-1);
+
+      print("after image int8list");
+      print("passportString:${ref.passportText.toDartString()}");
+      List<String> ocrTxtArr =ocrTxt.split("\n");
+        try {
+          print("before tryParse");
+          print("$ocrTxtArr");
+          result = MRZParser.tryParse(ocrTxtArr);
+          print("tryPass result: ${result!.documentNumber}");
+        } on MRZException catch (e) {
+          print("tryPass err");
+          print(e);
+          result = null;
+          return FmMrzOCR(
+              imgBinary, result);
+        }
+      var fmResult = FmMrzOCR(imgBinary, result);
+      return fmResult;
     }catch(e){
       print(e);
     }
@@ -104,6 +123,50 @@ extension EpfnMrzOCR on ffi.Pointer<FmsfnMrzOCR>{
     }
   }
 }
+extension EpfnMrzRect on ffi.Pointer<FmsfnRect>{
+  Rectangle toFluRectangle(){
+    Rectangle roiRect = Rectangle(ref.x, ref.y, ref.width, ref.height);
+    return roiRect;
+  }
+  void release(){
+    malloc.free(this);
+  }
+}
+extension EpfnMrzOCR2 on ffi.Pointer<FmsfnMrzOCR2>{
+  Future<FmMrzOCR2?> toMrzResult() async{
+    Rectangle rectRoi = ref.roiRect.toFluRectangle();
+    int errCode = ref.errCode;
+    MRZResult? mrzResult;
+    if(ref.errCode>=0) {
+      try {
+        List<String> rawArr = ref.rawOcrTxt.toDartString().split("\n");
+        mrzResult = MRZParser.tryParse(rawArr)!;
+      } catch (e) {
+        mrzResult = null;
+        return FmMrzOCR2(
+            rectRoi, mrzResult, -2);
+      }
+    }else{
+      mrzResult = null;
+    }
+    return FmMrzOCR2(rectRoi, mrzResult,errCode);
+  }
+
+  void release(){
+    var rectRoi = ref.roiRect;
+    var txtPointer = ref.rawOcrTxt;
+    if(rectRoi != ffi.nullptr){
+      rectRoi.release();
+    }
+    if(txtPointer != ffi.nullptr){
+      malloc.free(txtPointer);
+    }
+    if(this !=ffi.nullptr){
+      malloc.free(this);
+    }
+  }
+}
+
 
 extension EfmProcessArgument on FmProcessArgument{
   ffi.Pointer<Fms2nProcessArgument> toArgumentPointer(){
@@ -114,7 +177,6 @@ extension EfmProcessArgument on FmProcessArgument{
     return argumentPointer;
   }
 }
-
 extension EfmCameraImage on CameraImage {
   bool isEmpty() => planes.any((element) => element.bytes.isEmpty);
 
@@ -182,7 +244,6 @@ extension EfmCameraImage on CameraImage {
     return pointer;
   }
 }
-
 extension EfmFrameForProcess on FmFrameForProcess{
   ffi.Pointer<Fms2nFrameForProcess> toFms2nFrameForProcessPointer(){
     ffi.Pointer<Fms2nFrameForProcess> pointer = ffiCreateFrameForProcessP();
@@ -192,5 +253,5 @@ extension EfmFrameForProcess on FmFrameForProcess{
     fms2nFrameForProcess.processArgument = processArgument!.toArgumentPointer();
     return pointer;
   }
-
 }
+

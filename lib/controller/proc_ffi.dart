@@ -28,9 +28,14 @@ typedef CProcessImg2 = ffi.Void Function(ffi.Pointer<Fms2nImage>,ffi.Pointer<ffi
 typedef ProcessImg2 = void Function(ffi.Pointer<Fms2nImage>,ffi.Pointer<ffi.Uint8>,ffi.Pointer<ffi.Uint32>);
 
 
-//input the passport image,get the ocr text back
+//input the passport image,get the gray image and ocr text back
 typedef CMrzRoiOCR = ffi.Pointer<FmsfnMrzOCR> Function(ffi.Pointer<Fms2nFrameForProcess>);
 typedef MrzRoiOcr = ffi.Pointer<FmsfnMrzOCR> Function(ffi.Pointer<Fms2nFrameForProcess>);
+
+//input the passport image,get the roi rectangle and ocr text back
+typedef CMrzRoiOcr2 = ffi.Pointer<FmsfnMrzOCR2> Function(ffi.Pointer<Fms2nFrameForProcess>);
+typedef MrzRoiOcr2 = ffi.Pointer<FmsfnMrzOCR2> Function(ffi.Pointer<Fms2nFrameForProcess>);
+
 //to obtain pointer from native
 typedef CCreateImageProcessArgument = ffi.Pointer<Fms2nProcessArgument> Function();
 typedef FCreateImageProcessArgument = ffi.Pointer<Fms2nProcessArgument> Function();
@@ -66,6 +71,10 @@ final CreateRtImg ffiCreateRtImg = _lib
 final MrzRoiOcr ffiGetPassportOCR = _lib
     .lookup<ffi.NativeFunction<CMrzRoiOCR>>("getImgMrz")
     .asFunction();
+final MrzRoiOcr2 ffiGetMrzRoi = _lib
+    .lookup<ffi.NativeFunction<CMrzRoiOcr2>>("getImgMrzRect")
+    .asFunction();
+
 final ProcessImg ffiRoiStepByStep = _lib
     .lookup<ffi.NativeFunction<CProcessImg>>("getRoiMrzStepByStep")
     .asFunction();

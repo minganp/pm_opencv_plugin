@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -66,51 +67,32 @@ public class PmOpencvPlugin implements FlutterPlugin, MethodCallHandler {
 
     dstPathDir = binding.getApplicationContext().getFilesDir() + dstPathDir;
     //String dstInitPathDir = context.getFilesDir() + "/tesseract";
-    String dstPathFile = dstPathDir;
+    String dstPathFile = dstPathDir+srcFile;
     FileOutputStream outFile = null;
     try{
       inFile = binding.getApplicationContext().getAssets().open(assetPath);
     }catch(Exception e){
       Log.e("err",e.getMessage());
       errCode = -1;
-      errMsg = "0";
+      errMsg = "Can not find trained data in Assets";
       return new PrepareMrzResult(errCode,dstPathFile,errMsg);
     }
 
-    try {
-
       File f = new File(dstPathDir);
-
       if (!f.exists()) {
         if (!f.mkdirs()) {
-          errCode = -1;
-          errMsg = "Trained can't be created.";
+          errCode = -2;
+          errMsg = "Trained file directory can't be created.";
           //Toast.makeText(context, srcFile + " can't be created.", Toast.LENGTH_SHORT).show();
           return new PrepareMrzResult(errCode,dstPathFile,errMsg);
         }
-        outFile = new FileOutputStream(dstPathFile);
-      } else {
-        fileExistFlag = true;
-      }
-    } catch (Exception ex) {
-      errCode = -1;
-      errMsg = assetPath+"does not exists";
-      return new PrepareMrzResult(errCode,dstPathFile,errMsg);
-      //Log.e(ERR_TAG, ex.getMessage());
-    } finally {
-      if (fileExistFlag) {
         try {
-          if (inFile != null) inFile.close();
-          //mTess.init(dstInitPathDir, language);
-          errCode = 1;
-          errMsg = "Trained file already exists";
-        } catch (Exception ex) {
-          errCode = -1;
-          errMsg = "3";
-          Log.e("ERR", ex.getMessage());
+          outFile = new FileOutputStream(dstPathFile);
+        }catch (FileNotFoundException e) {
+          errCode = -3;
+          errMsg = "Cannot create file!"+e;
+          return new PrepareMrzResult(errCode,dstPathFile,errMsg);
         }
-      }
-      else if (inFile != null && outFile != null) {
         try {
           //copy file
           byte[] buf = new byte[1024];
@@ -120,21 +102,20 @@ public class PmOpencvPlugin implements FlutterPlugin, MethodCallHandler {
           }
           inFile.close();
           outFile.close();
-         // mTess.init(dstInitPathDir, language);
+          // mTess.init(dstInitPathDir, language);
           errCode = 0;
           errMsg = "Trained file prepare success";
         } catch (Exception ex) {
-          errCode = -1;
+          errCode = -5;
           errMsg = "4";
+          return new PrepareMrzResult(errCode,dstPathFile,errMsg);
           //Log.e(ERR_TAG, ex.getMessage());
         }
+      } else {
+        fileExistFlag = true;
+        errCode = 1;
+        errMsg = "Trained file already exists";
       }
-      else {
-        errCode = -1;
-        errMsg = "Trained file can't be read";
-        //Toast.makeText(context, srcFile + " can't be read.", Toast.LENGTH_SHORT).show();
-      }
-    }
     Log.e("-----LOG",errMsg);
     return new PrepareMrzResult(errCode,dstPathFile,errMsg);
   }

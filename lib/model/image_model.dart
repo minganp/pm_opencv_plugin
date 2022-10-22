@@ -9,13 +9,13 @@
    Efm   extension of flutter model
  */
 
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:ffi/ffi.dart';
 import 'dart:ffi' as ffi;
-
-
+import 'package:pm_opencv_plugin/mrz_parser-master/lib/mrz_parser.dart';
 class Fms2nProcessArgument extends ffi.Struct{
   external ffi.Pointer<Utf8> pMrzTFD; //directory of passport mrz trained file directory
   external ffi.Pointer<Utf8> pMrzTF; //directory of passport mrz trained file
@@ -70,7 +70,12 @@ class FmsfnMrzOCR extends ffi.Struct{
   external ffi.Pointer<FmsfnImage> imgMrzRoi;
   external ffi.Pointer<Utf8> passportText;
 }
-
+class FmsfnMrzOCR2 extends ffi.Struct{
+  external ffi.Pointer<FmsfnRect> roiRect;
+  external ffi.Pointer<Utf8> rawOcrTxt;
+  @ffi.Int32()
+  external int errCode;
+}
 
 class FmProcessArgument {
   String? pMrzTFD; //directory of passport mrz trained file directory
@@ -80,9 +85,22 @@ class FmProcessArgument {
 }
 class FmMrzOCR{
   Uint8List imgBytes;
-  String ocrText;
+  MRZResult? ocrText;
   late Duration processDur;
   FmMrzOCR(this.imgBytes,this.ocrText);
+}
+class FmMrzOCR2 {
+  //rece of roi
+  Rectangle roiRect;
+
+  MRZResult? passResult;
+
+  //0: success, -1: training data error, -2: recognition error, -3: roi error
+  int errCode;
+
+  //process duration
+  late Duration processDur;
+  FmMrzOCR2(this.roiRect,this.passResult,this.errCode);
 }
 class FmFrameForProcess {
   CameraImage image;

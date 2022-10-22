@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import '../plugin_test.dart';
 
 const title = 'Native OpenCV Example';
@@ -30,8 +29,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
       // TODO: implement initState
       super.initState();
-      getTemporaryDirectory().then((dir) => tempDir = dir);
-
   }
   void showVersion() {
     final scaffoldMessenger = ScaffoldMessenger.of(context);

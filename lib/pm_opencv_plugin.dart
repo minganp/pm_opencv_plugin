@@ -2,7 +2,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pm_opencv_plugin/pm_opencv_plugin_method_channel.dart';
 
 import 'pm_opencv_plugin_platform_interface.dart';

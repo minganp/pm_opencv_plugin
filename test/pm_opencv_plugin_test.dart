@@ -18,6 +18,12 @@ class MockPmOpencvPluginPlatform
     // TODO: implement imageToUTF8Text
     throw UnimplementedError();
   }
+
+  @override
+  Future<PrepareMrzResult> initMrzTrainedData() {
+    // TODO: implement initMrzTrainedData
+    throw UnimplementedError();
+  }
 }
 
 void main() {

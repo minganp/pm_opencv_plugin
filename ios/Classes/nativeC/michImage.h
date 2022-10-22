@@ -31,7 +31,7 @@ struct MichRtImgFltFmt{
     uint32_t *size;
 };
 
-struct MPoint{
+struct MRect{
     uint32_t x;
     uint32_t y;
     uint32_t width;
@@ -43,4 +43,9 @@ struct MrzRoiOCR{
     const char * ocrTxt;
 };
 
+struct MrzRoiOCR2{
+    MRect * mRect;
+    char * ocrTxt;  //if errCode <0 ,it contains the error of recognition, otherwise it is the recognized words.
+    uint32_t errCode;  //0: success, -1: training data error, -2: recognition error, -3: roi error
+};
 #endif
