@@ -6,6 +6,7 @@ import 'package:pm_opencv_plugin_example/util/util.dart';
 class ScanLine extends StatefulWidget{
   final double height;
   final double width;
+
   bool startOr = false;
   ScanLine(
       {Key? key,
@@ -16,7 +17,7 @@ class ScanLine extends StatefulWidget{
 
   @override
   State<StatefulWidget> createState() => ScanLineState();
-  }
+}
 
 class ScanLineState extends State<ScanLine>
     with SingleTickerProviderStateMixin {
@@ -99,25 +100,6 @@ class AuxiliaryWordsState extends State<AuxiliaryWords>
       ),
     );
   }
-
 }
-
-
-Widget scanStack(double height,double width){
-        return Container(
-          height: height,
-          width:  width,
-          padding: const EdgeInsets.only(
-              left: 10.0, right: 10.0, top: 10.0, bottom: 10.0),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey, width: 5.0),
-          ),
-          child: Stack(
-              children: [
-                const AuxiliaryWords(),
-                ScanLine(width: width, height: height),
-              ]
-          ));
-    }
 
 

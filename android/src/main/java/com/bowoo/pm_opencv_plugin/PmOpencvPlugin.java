@@ -84,7 +84,7 @@ public class PmOpencvPlugin implements FlutterPlugin, MethodCallHandler {
           errCode = -2;
           errMsg = "Trained file directory can't be created.";
           //Toast.makeText(context, srcFile + " can't be created.", Toast.LENGTH_SHORT).show();
-          return new PrepareMrzResult(errCode,dstPathFile,errMsg);
+          return new PrepareMrzResult(errCode,dstPathDir,errMsg);
         }
         try {
           outFile = new FileOutputStream(dstPathFile);
@@ -117,7 +117,7 @@ public class PmOpencvPlugin implements FlutterPlugin, MethodCallHandler {
         errMsg = "Trained file already exists";
       }
     Log.e("-----LOG",errMsg);
-    return new PrepareMrzResult(errCode,dstPathFile,errMsg);
+    return new PrepareMrzResult(errCode,dstPathDir,errMsg);
   }
 
   @Override

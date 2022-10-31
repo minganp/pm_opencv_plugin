@@ -10,7 +10,7 @@ const char * getTextFromMrz(const char *path,const char* lang,cv::Mat roi){
     tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
     //api->Init(trainedPath,lang)==-1
     const char *outText;
-    path = "/data/user/0/com.bowoo.pm_opencv_plugin_example/files/trainedData/";
+    //path = "/data/user/0/com.bowoo.pm_opencv_plugin_example/files/trainedData/";
     LOGI("Native C: trained file path: %s",path);
     int i = api->Init(path,"mrz");
     LOGI("Native C: init result: %d",i);
