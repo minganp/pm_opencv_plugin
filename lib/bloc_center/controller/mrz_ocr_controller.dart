@@ -6,7 +6,6 @@ import 'package:pm_opencv_plugin/bloc_center/enum/enum_process_state.dart';
 import 'package:pm_opencv_plugin/bloc_center/controller/i_process_controller.dart';
 class MrzProcessController extends CommonProcess<FmMrzOCR>{
 
-
   @override
   late Handler<FmMrzOCR> handler;
 

@@ -1,0 +1,15 @@
+Map<int,String> errMsg = {
+  0 : "success",
+  -1 : "Native unknown error",
+  -99 : "Bad process argument",
+  -98 : "Capture image null",
+  -101 : "Native result null",
+  -102 : "OCR Text null",
+  -103 : "Tesseract Error",
+  -104 : "Unknown Native Isolate err",
+  -105 : "transfer image to UInt8List image failed",
+  -201 : "Mrz parse Error",
+  -202 : "Mrz parse result null. maybe caused by check data",
+  -203 : "Mrz parse Error with known reason",
+  -204 : "Mrz parse Error with known reason",
+};

@@ -1,8 +1,25 @@
+import 'package:pm_opencv_plugin/globals/err_msg.dart' as err;
+
 class IProcessResult<T>{
-   //0: success,
-   // -1: native error 1, -2: native error 2, -3: native error 3
-   // -4: scan
-   late int errCode;
-   late String msg;
-   late T result;
+   late final int errCode;
+   late final String? msg;
+   late final T? result;
+   IProcessResult(this.errCode,this.msg,this.result);
+
+   IProcessResult.finished({
+      required int ec,
+      String? eMsg,
+      required T pResult}){
+      errCode = ec;
+      eMsg == null?msg = err.errMsg[errCode]:msg = eMsg;
+      result = pResult;
+   }
+   IProcessResult.failed({
+      required int ec,
+      String? eMsg,
+   }){
+      errCode = ec;
+      eMsg == null?msg = err.errMsg[errCode]:msg = eMsg;
+      result = null;
+   }
 }

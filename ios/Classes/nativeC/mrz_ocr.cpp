@@ -4,13 +4,13 @@
 #include <tesseract/baseapi.h>
 #include "roi_mrz_passport.h"
 //#include "tessTrain.h"
+
 const char * getTextFromMrz(const char *path,const char* lang,cv::Mat roi){
     //LOGI("----Begin to initial TessBaseAPI,path: %s,file: %s", path,lang);
     //LOGI("----width:%d,height:%d,channel:%d",roi.size().width,roi.size().height,roi.channels());
     tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
     //api->Init(trainedPath,lang)==-1
     const char *outText;
-    //path = "/data/user/0/com.bowoo.pm_opencv_plugin_example/files/trainedData/";
     LOGI("Native C: trained file path: %s",path);
     int i = api->Init(path,"mrz");
     LOGI("Native C: init result: %d",i);

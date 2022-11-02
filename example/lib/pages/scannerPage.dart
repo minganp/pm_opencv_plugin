@@ -124,7 +124,7 @@ class ScannerState extends State<ScannerPage> {
     FmProcessArgument argument = FmProcessArgument();
     argument.pMrzTFD = widget.trainedDataPath;
     argument.pMrzTF = "mrz.trainedData";
-    processController.startProcessListener(argument);
+    processController.startProcess(argument);
     setState(() {
       beginScan = true;
     });

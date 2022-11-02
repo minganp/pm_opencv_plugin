@@ -53,8 +53,6 @@ public class PmOpencvPlugin implements FlutterPlugin, MethodCallHandler {
   }
 
   private PrepareMrzResult prepareMrz(){
-    boolean fileExistFlag = false;
-
 
     String dstPathDir = "/trainedData/";
     String srcFile = "mrz.traineddata";
@@ -68,7 +66,7 @@ public class PmOpencvPlugin implements FlutterPlugin, MethodCallHandler {
     dstPathDir = binding.getApplicationContext().getFilesDir() + dstPathDir;
     //String dstInitPathDir = context.getFilesDir() + "/tesseract";
     String dstPathFile = dstPathDir+srcFile;
-    FileOutputStream outFile = null;
+    FileOutputStream outFile ;
     try{
       inFile = binding.getApplicationContext().getAssets().open(assetPath);
     }catch(Exception e){
@@ -112,7 +110,6 @@ public class PmOpencvPlugin implements FlutterPlugin, MethodCallHandler {
           //Log.e(ERR_TAG, ex.getMessage());
         }
       } else {
-        fileExistFlag = true;
         errCode = 1;
         errMsg = "Trained file already exists";
       }

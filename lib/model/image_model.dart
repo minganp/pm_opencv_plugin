@@ -14,6 +14,7 @@ import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:ffi/ffi.dart';
+import 'package:pm_opencv_plugin/model/process_result.dart';
 import 'dart:ffi' as ffi;
 import 'package:pm_opencv_plugin/mrz_parser-master/lib/mrz_parser.dart';
 class Fms2nProcessArgument extends ffi.Struct{
@@ -83,7 +84,7 @@ class FmProcessArgument {
 
   FmProcessArgument({this.pMrzTFD, this.pMrzTF});
 }
-class FmMrzOCR{
+class FmMrzOCR {
   Uint8List imgBytes;
   MRZResult? ocrText;
   late Duration processDur;

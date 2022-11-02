@@ -20,7 +20,7 @@ abstract class CommonProcess<T> {
   late Timer _timer ;
   late bool isTimeout = false;
   StateCenter stateCenter = StateCenter();
-  late T result;
+  late T? result;
   late StreamSubscription<ProcessState> stateSubscription;
 
   StreamController<IProcessResult<T>> resultCtl = StreamController<IProcessResult<T>>();
@@ -54,7 +54,7 @@ abstract class CommonProcess<T> {
       timeOutSeconds * 1000 / (ticker * scanFreqMilliseconds) < 1.0;
 
   //entrance for process
-  Future<void> startProcessListener(FmProcessArgument? argument) async {
+  Future<void> startProcess(FmProcessArgument? argument) async {
     //_launchListeners();
     //print(stateCenter.isPaused);
     this.argument = argument;
@@ -63,14 +63,12 @@ abstract class CommonProcess<T> {
     //specialProcess();
   }
   Future<void> restartProcess(FmProcessArgument? argument) async {
-    _pauseListeners();
-    //stateSubscription.pause();
-    _stopStream();
-    _resetTimer();
-    stopNativeProcess();
-    stateCenter.initState();
+    //_pauseListeners();
+    stateSubscription.pause();
+    await _stopStream();
+    await stopNativeProcess();
     stateSubscription.resume();
-    startProcessListener(argument);
+    _startStreaming();
   }
   Future<void> stopProcess() async{
     print("----to stop process");
@@ -85,8 +83,6 @@ abstract class CommonProcess<T> {
   Future<void> specialProcess(ProcessState state);
   Future<void> startNativeProcess();
 
-  void _launchListeners() {
-  }
 
   void _pauseListeners(){
     stateCenter.pause();
@@ -109,7 +105,6 @@ abstract class CommonProcess<T> {
       try {
         stateCenter.setStreamState(StreamState.streaming);
         print("will start streaming: streamState:${stateCenter.getStreamState}");
-
         await camController!.startImageStream((image) async{
           cameraImage = image;
           if(stateCenter.getStreamState != StreamState.frameStreamed){
@@ -153,6 +148,7 @@ abstract class CommonProcess<T> {
   }
 
   Future<void> stopNativeProcess() async{
+    stateCenter.setNativeState(NativeState.waiting);
     return;
   }
 }
