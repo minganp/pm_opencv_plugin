@@ -1,8 +1,12 @@
 import 'dart:ffi' as ffi;
+import 'package:ffi/ffi.dart';
 
 import 'dart:io';
 
 import 'package:pm_opencv_plugin/model/image_model.dart';
+
+import '../model/frame_for_process.dart';
+import '../model/process_argument.dart';
 
 //to obtain image pointer from native
 typedef CCreateMichImg = ffi.Pointer<Fms2nImage> Function();
@@ -39,6 +43,9 @@ typedef MrzRoiOcr2 = ffi.Pointer<FmsfnMrzOCR2> Function(ffi.Pointer<Fms2nFrameFo
 //to obtain pointer from native
 typedef CCreateImageProcessArgument = ffi.Pointer<Fms2nProcessArgument> Function();
 typedef FCreateImageProcessArgument = ffi.Pointer<Fms2nProcessArgument> Function();
+
+typedef CMrzOCRJson =  ffi.Pointer<Utf8> Function(ffi.Pointer<Fms2nFrameForProcess>);
+typedef MrzOCRJson =  ffi.Pointer<Utf8> Function(ffi.Pointer<Fms2nFrameForProcess>);
 ffi.DynamicLibrary _openDynamicLibrary() {
   if (Platform.isAndroid) {
     return ffi.DynamicLibrary.open('libOpenCV_ffi.so');
@@ -71,6 +78,11 @@ final CreateRtImg ffiCreateRtImg = _lib
 final MrzRoiOcr ffiGetPassportOCR = _lib
     .lookup<ffi.NativeFunction<CMrzRoiOCR>>("getImgMrz")
     .asFunction();
+
+final MrzRoiOcr ffiGetPassImageJson = _lib
+  .lookup<ffi.NativeFunction<CMrzRoiOCR>>("getMrzImgJson")
+  .asFunction();
+
 final MrzRoiOcr2 ffiGetMrzRoi = _lib
     .lookup<ffi.NativeFunction<CMrzRoiOcr2>>("getImgMrzRect")
     .asFunction();
@@ -83,4 +95,8 @@ final ProcessImg2 ffiProcessImg2 = _lib
     .asFunction();
 final ProcessImg ffiProcessImg = _lib
     .lookup<ffi.NativeFunction<CProcessImg>>("processAndroidImage")
+    .asFunction();
+
+final MrzOCRJson ffiGetMrzJson = _lib
+    .lookup<ffi.NativeFunction<CMrzOCRJson>>("getImgMrzJson")
     .asFunction();

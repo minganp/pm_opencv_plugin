@@ -38,4 +38,6 @@ enum ProcessErr {
   cameraNullException,
   cameraImageNullException,
   cameraStreamException,
+  platformNotSupportException,
+  nativeProcessTimeOut;
 }

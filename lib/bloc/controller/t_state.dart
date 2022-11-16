@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
 class TState<T> {
@@ -11,11 +12,15 @@ class TState<T> {
   }
 
   set state(T iState) {
-    print("before add state: $_state");
+    if (kDebugMode) {
+      print("before add state: $_state");
+    }
 
     if (_state == iState) return;
     _state = iState;
-    print("will add state: $_state");
+    if (kDebugMode) {
+      print("will add state: $_state");
+    }
     streamController.sink.add(_state);
   }
 

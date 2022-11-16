@@ -7,6 +7,7 @@
 
 #include "michImage.h"
 #include "processImage.h"
+
 //#include "roi_mrz_passport.h"
 
 #define  LOG_TAG    "CVPLUGIN"

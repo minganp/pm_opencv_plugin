@@ -3,7 +3,7 @@
 //
 #include <tesseract/baseapi.h>
 #include "roi_mrz_passport.h"
-//#include "tessTrain.h"
+#include "MRZParser.cpp"
 
 const char * getTextFromMrz(const char *path,const char* lang,cv::Mat roi){
     //LOGI("----Begin to initial TessBaseAPI,path: %s,file: %s", path,lang);
@@ -37,6 +37,15 @@ const char * getTextFromMrz(const char *path,const char* lang,cv::Mat roi){
         api->End();
     }
     return outText;
+}
+vector<string> splitStr2v(std::string rawStr){
+    vector<string> result;
+    string token;
+    std::istringstream ss(rawStr);
+    while (std::getline(ss,token,'\n')){
+        result.push_back(token);
+    }
+    return result;
 }
 
 int getTextFromMrz2(
@@ -100,7 +109,7 @@ MrzRoiOCR* getImgMrz(ImgForProcess *passImgForProcess){
     MichRtImgFltFmt *mrzImg = mat2MichRtImg(mrzRoiMat);
     MrzRoiOCR *mrzRoiOcr=(struct MrzRoiOCR *) malloc((sizeof(struct MrzRoiOCR)));
     mrzRoiOcr->img = mrzImg;
-    mrzRoiOcr->ocrTxt = ocrTxt;
+    //mrzRoiOcr->ocrTxt = ocrTxt;
     LOGI("--from native : %s",mrzRoiOcr->ocrTxt);
     return mrzRoiOcr;
 }
@@ -117,10 +126,80 @@ MrzRoiOCR2* getImgMrzRect(ImgForProcess *passImgForProcess){
             mrzRoiMat,
             &mrzRoiOcr2->ocrTxt
             );
+
     mrzRoiOcr2->errCode = errCode;
     //MichRtImgFltFmt *mrzImg = mat2MichRtImg(mrzRoiMat);
 
     //mrzRoiOcr2->img = mrzImg;
     return mrzRoiOcr2;
+}
+
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+const char * getImgMrzJson(ImgForProcess *passImgForProcess){
+    string jsonStr;
+    MRZParser parser;
+
+    string errMsg;
+    cv::Mat mrzRoiMat = getMrzRoiMat(passImgForProcess);
+    if(mrzRoiMat.size().area() != 0){
+        const char *ocrTxt = getTextFromMrz(
+                passImgForProcess->processArgument->trainFileDirectory,
+                passImgForProcess->processArgument->trainFile,
+                mrzRoiMat);
+        if(*ocrTxt != '\0'){
+            LOGI("--from native : %s",ocrTxt);
+            const vector<std::string> lines = splitStr2v((ocrTxt));
+            if( parser.parse(lines,errMsg)){
+                jsonStr = parser.toJsonString();
+            }else{
+                jsonStr ="-1"+errMsg;
+            }
+        }else{
+            jsonStr = "-1. OCR string is null";
+        }
+    }else{
+        jsonStr = "-1. ROI is empty.";
+    }
+    LOGI("--From native, after Parse.result Json : %s",jsonStr.c_str());
+    return jsonStr.c_str();
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+MrzRoiOCR* getMrzImgJson(ImgForProcess *passImgForProcess){
+    string jsonStr;
+    MRZParser parser;
+    string errMsg;
+
+    cv::Mat imageMat = prepareMat(passImgForProcess->img);
+    MichRtImgFltFmt *idImage = mat2MichRtImg(imageMat);
+    cv::Mat mrzRoiMat= getMrzRoiWithImgMat(imageMat);
+
+    if(mrzRoiMat.size().area() != 0){
+        const char *ocrTxt = getTextFromMrz(
+            passImgForProcess->processArgument->trainFileDirectory,
+            passImgForProcess->processArgument->trainFile,
+            mrzRoiMat);
+        if(*ocrTxt != '\0'){
+            LOGI("--from native : %s",ocrTxt);
+            const vector<std::string> lines = splitStr2v((ocrTxt));
+            if( parser.parse(lines,errMsg)){
+                jsonStr = parser.toJsonString();
+            }else{
+                jsonStr = "-1"+errMsg;
+            }
+        }else{
+            idImage = nullptr;
+            jsonStr = "-1. OCR string is null";
+        }
+    }else{
+        jsonStr = "-1. ROI is empty.";
+    }
+    MrzRoiOCR *mrzRoiOcr=(struct MrzRoiOCR *) malloc((sizeof(struct MrzRoiOCR)));
+    mrzRoiOcr->img = idImage;
+    mrzRoiOcr->ocrTxt = new char[jsonStr.length()+1];
+    strcpy(mrzRoiOcr->ocrTxt,jsonStr.c_str());
+    LOGI("--from native end: %s",mrzRoiOcr->ocrTxt);
+    return mrzRoiOcr;
 }
 

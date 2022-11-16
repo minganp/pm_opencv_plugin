@@ -1,6 +1,7 @@
 Map<int,String> errMsg = {
   0 : "success",
   -1 : "Native unknown error",
+  -97 : "Process canceled",
   -99 : "Bad process argument",
   -98 : "Capture image null",
   -101 : "Native result null",
@@ -8,8 +9,13 @@ Map<int,String> errMsg = {
   -103 : "Tesseract Error",
   -104 : "Unknown Native Isolate err",
   -105 : "transfer image to UInt8List image failed",
+  -106 : "Native process failed",
   -201 : "Mrz parse Error",
   -202 : "Mrz parse result null. maybe caused by check data",
   -203 : "Mrz parse Error with known reason",
   -204 : "Mrz parse Error with known reason",
+  -205 : "Mrz json string null",
+  -206 : "Parse json to mrz failed",
+  -210 : "Map pointer image to Uint8List",
+  -900 : "Can't find camera or selected is null"
 };

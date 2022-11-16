@@ -14,41 +14,12 @@ import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:ffi/ffi.dart';
-import 'package:pm_opencv_plugin/model/process_result.dart';
+import 'package:pm_opencv_plugin/model/process_argument.dart';
 import 'dart:ffi' as ffi;
 import 'package:pm_opencv_plugin/mrz_parser-master/lib/mrz_parser.dart';
-class Fms2nProcessArgument extends ffi.Struct{
-  external ffi.Pointer<Utf8> pMrzTFD; //directory of passport mrz trained file directory
-  external ffi.Pointer<Utf8> pMrzTF; //directory of passport mrz trained file
-}
-class Fms2nImagePlane extends ffi.Struct{
-  external ffi.Pointer<ffi.Uint8> planeData;
-  external ffi.Pointer<Fms2nImagePlane> nextPlane;
 
-  @ffi.Int32()
-  external int bytesPerRow;
+import 'mrz.dart';
 
-  @ffi.Int32()
-  external int length;
-
-}
-class Fms2nImage extends ffi.Struct{
-  external ffi.Pointer<Fms2nImagePlane> plane;
-  @ffi.Int32()                //0-IOS,1-Android,
-  external int platform;
-  @ffi.Int32()
-  external int width;          //camera image width
-  @ffi.Int32()
-  external int height;         //camera image height
-  @ffi.Int32()
-  external int rotation;       //rotation degree of image, get from mobile sensor
-
-  //external ffi.Pointer<Fms2nProcessArgument> processArgument;
-}
-class Fms2nFrameForProcess extends ffi.Struct{
-  external ffi.Pointer<Fms2nImage> imageStructPointer;
-  external ffi.Pointer<Fms2nProcessArgument> processArgument;
-}
 
 class FmsfnImage extends ffi.Struct{
   external ffi.Pointer<ffi.Uint8> rtImg;    //returned Image of UInt8List
@@ -77,18 +48,21 @@ class FmsfnMrzOCR2 extends ffi.Struct{
   @ffi.Int32()
   external int errCode;
 }
-
-class FmProcessArgument {
-  String? pMrzTFD; //directory of passport mrz trained file directory
-  String? pMrzTF; //directory of passport mrz trained file}
-
-  FmProcessArgument({this.pMrzTFD, this.pMrzTF});
+class FmsfnMrzJson extends ffi.Struct{
+  external ffi.Pointer<ffi.Char> mrzJsonStr;
 }
+
+
 class FmMrzOCR {
-  Uint8List imgBytes;
-  MRZResult? ocrText;
+  Uint8List? imgBytes;
+  Mrz? mrz;
   late Duration processDur;
-  FmMrzOCR(this.imgBytes,this.ocrText);
+  FmMrzOCR(this.imgBytes,this.mrz);
+}
+class FmMrzJson{
+  Mrz? mrz;
+  late Duration? processDur;
+  FmMrzJson(this.mrz);
 }
 class FmMrzOCR2 {
   //rece of roi
@@ -102,14 +76,4 @@ class FmMrzOCR2 {
   //process duration
   late Duration processDur;
   FmMrzOCR2(this.roiRect,this.passResult,this.errCode);
-}
-class FmFrameForProcess {
-  CameraImage image;
-  int? rotation;
-  FmProcessArgument? processArgument;
-  FmFrameForProcess({
-    required this.image,
-    this.rotation,
-    this.processArgument
-  });
 }

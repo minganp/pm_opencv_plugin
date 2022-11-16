@@ -1,13 +1,16 @@
 
+import 'dart:ffi' as ffi;
 import 'dart:typed_data';
-
+import 'package:ffi/ffi.dart';
 import 'package:pm_opencv_plugin/Exception/exception.dart';
 import 'package:pm_opencv_plugin/controller/model_extension.dart';
 import 'package:pm_opencv_plugin/controller/proc_ffi.dart';
-import 'package:pm_opencv_plugin/mrz_parser-master/lib/mrz_parser.dart';
 
 import 'package:pm_opencv_plugin/model/image_model.dart';
 import 'package:pm_opencv_plugin/model/process_result.dart';
+
+import '../model/frame_for_process.dart';
+import '../model/mrz.dart';
 Future<IProcessResult<FmMrzOCR2>> mrzRoiProcess(FmFrameForProcess frame) async {
     final stopwatch = Stopwatch()..start();
 //    try {
@@ -30,49 +33,30 @@ Future<IProcessResult<FmMrzOCR2>> mrzRoiProcess(FmFrameForProcess frame) async {
  */
 }
 
-Future<IProcessResult<FmMrzOCR>> mrzOcrProcessor(FmFrameForProcess frame) async{
-  Uint8List? memoryImg;
-  IProcessResult<FmMrzOCR> result;
 
+Future<IProcessResult<FmMrzJson>> mrzJsonProcessor(FmFrameForProcess frame) async{
+  IProcessResult<FmMrzJson> result;
   var imgForProcessP = frame.toFms2nFrameForProcessPointer();//_prepareFrameFroProcessPointer(frame);
-  final mrzNativeResult = ffiGetPassportOCR(imgForProcessP);
-
-  void release(){
+  ffi.Pointer<Utf8> mrzNativeResult = ffiGetMrzJson(imgForProcessP);
+  String r = mrzNativeResult.toDartString();
+    try {
+      Mrz mrz = Mrz.fromJsonString(r);
+      result = IProcessResult.finished(
+          ec: 0,
+          pResult: FmMrzJson(mrz));
+    }on PmExceptionEx catch(e){
+      result = IProcessResult.finished(
+          ec: -206,
+          eMsg: e.msg,
+          pResult: FmMrzJson(null));
+    }catch(e){
+      print(e.toString());
+      result = IProcessResult.finished(
+          ec: -206,
+          eMsg: e.toString(),
+          pResult: FmMrzJson(null));
+    }
     imgForProcessP.release();
-    mrzNativeResult.release();
-  }
-
-  //return img is null
-  try {
-    memoryImg = mrzNativeResult.mapImg2ui8list();
-  }on PmException catch(e){
-    release();
-    throw PmException(e.errCode);
-  }on PmExceptionEx catch(e){
-    release();
-    throw PmExceptionEx(e.errCode, e.exMsg);
-  }
-  //parse the mrz if
-  try {
-    MRZResult? mrzResult = mrzNativeResult.parseMrz();
-    result = IProcessResult.finished(
-        ec:0,
-        pResult:FmMrzOCR(memoryImg!, mrzResult));
-  }on PmException catch(e){
-    result = IProcessResult.finished(
-        ec: e.errCode,
-        pResult: FmMrzOCR(memoryImg!, null));
-  }on PmExceptionEx catch(e){
-    result = IProcessResult.finished(
-        ec: e.errCode,
-        eMsg: e.exMsg,
-        pResult: FmMrzOCR(memoryImg!, null));
-  }catch(e){
-    result = IProcessResult.finished(
-        ec: -204,
-        eMsg: e.toString(),
-        pResult: FmMrzOCR(memoryImg!, null));
-  }
-  release();
-  return result;
+    //malloc.free(mrzNativeResult);
+    return result;
 }

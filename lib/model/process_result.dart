@@ -9,7 +9,7 @@ class IProcessResult<T>{
    IProcessResult.finished({
       required int ec,
       String? eMsg,
-      required T pResult}){
+      T? pResult}){
       errCode = ec;
       eMsg == null?msg = err.errMsg[errCode]:msg = eMsg;
       result = pResult;
@@ -18,6 +18,7 @@ class IProcessResult<T>{
       required int ec,
       String? eMsg,
    }){
+      print("failed IProcessResult");
       errCode = ec;
       eMsg == null?msg = err.errMsg[errCode]:msg = eMsg;
       result = null;

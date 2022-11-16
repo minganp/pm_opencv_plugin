@@ -150,6 +150,26 @@ cv::Mat getMrzRoiMat(ImgForProcess *imgForProcess){
     return _resized(_rect);
 }
 
+cv::Mat getMrzRoiWithImgMat(cv::Mat imgMat){
+    cv::Mat _resized;
+    cv::Mat _pDark;
+    cv::Mat _pThresh;
+    cv::Mat _pSmoothed;
+    cv::Mat _gray;
+    cv::Rect _rect;
+
+    //cv::Mat imgMat=prepareMat(imgForProcess->img);
+    _resize(imgMat,_resized);
+    toGray(_resized,_gray);
+    smooth(_gray,_pSmoothed);
+    find_dark_regions(_pSmoothed,_pDark);
+    _apply_threshold(_pDark,_pThresh);
+    _find_coordinates(_pThresh,_pSmoothed,&_rect);
+    LOGI("ROI X: %d,ROI Y: %d,ROI W: %d,ROI H: %d",_rect.x,_rect.y,_rect.width,_rect.height);
+
+    return _resized(_rect);
+}
+
 cv::Mat getMrzRoiMatRect(ImgForProcess *imgForProcess,MRect *mRect){
     cv::Mat _resized;
     cv::Mat _pDark;

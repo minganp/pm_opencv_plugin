@@ -12,13 +12,14 @@ import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
-
+import 'package:pm_opencv_plugin/model/process_argument.dart';
 import 'package:camera/camera.dart';
 import 'package:ffi/ffi.dart';
 import 'package:pm_opencv_plugin/Exception/exception.dart';
 import 'package:pm_opencv_plugin/controller/proc_ffi.dart';
 import 'package:pm_opencv_plugin/mrz_parser-master/lib/mrz_parser.dart';
 
+import '../model/frame_for_process.dart';
 import '../model/image_model.dart';
 
 extension Ep2nImagePointerExt on ffi.Pointer<Fms2nImage> {
@@ -36,12 +37,6 @@ extension Ep2nImagePointerExt on ffi.Pointer<Fms2nImage> {
   }
 }
 
-extension Ep2nProcessArgument on ffi.Pointer<Fms2nProcessArgument> {
-  void release() {
-    malloc.free(ref.pMrzTFD);
-    malloc.free(ref.pMrzTF);
-  }
-}
 
 extension Ep2nFrameForProcess on ffi.Pointer<Fms2nFrameForProcess> {
   void release() {
@@ -65,9 +60,11 @@ extension EpfnImage on ffi.Pointer<FmsfnImage> {
     var imgP = ref.rtImg;
     var sizeP = ref.rtSize;
     if (imgP != ffi.nullptr) {
+      print("release imgp");
       malloc.free(imgP);
     }
     if (sizeP != ffi.nullptr) {
+      print("release sizep");
       malloc.free(sizeP);
     }
     malloc.free(this);
@@ -85,6 +82,17 @@ extension EpfnMrzOCR on ffi.Pointer<FmsfnMrzOCR> {
     return uInt8ListImg;
   }
 
+  String? mapNativeStr2JsonStr(){
+    String? jsonStr;
+    try {
+      jsonStr = ref.passportText.toDartString();
+      print("after ref: $jsonStr");
+    }catch(e){
+      throw PmExceptionEx(-205,e.toString());
+    }
+    return jsonStr;
+  }
+  /*
   MRZResult? parseMrz(){
     MRZResult? result;
     var ocrTxt = ref.passportText.toDartString();
@@ -104,6 +112,7 @@ extension EpfnMrzOCR on ffi.Pointer<FmsfnMrzOCR> {
       throw PmExceptionEx(-203,e.toString());
     }
   }
+ */
 
   void release() {
     var imgPointer = ref.imgMrzRoi;
@@ -165,15 +174,7 @@ extension EpfnMrzOCR2 on ffi.Pointer<FmsfnMrzOCR2> {
   }
 }
 
-extension EfmProcessArgument on FmProcessArgument {
-  ffi.Pointer<Fms2nProcessArgument> toArgumentPointer() {
-    ffi.Pointer<Fms2nProcessArgument> argumentPointer = ffiCreateArgumentP();
-    final argumentP = argumentPointer.ref;
-    argumentP.pMrzTFD = pMrzTFD!.toNativeUtf8();
-    argumentP.pMrzTF = pMrzTF!.toNativeUtf8();
-    return argumentPointer;
-  }
-}
+
 
 extension EfmCameraImage on CameraImage {
   bool isEmpty() => planes.any((element) => element.bytes.isEmpty);
@@ -243,13 +244,4 @@ extension EfmCameraImage on CameraImage {
   }
 }
 
-extension EfmFrameForProcess on FmFrameForProcess {
-  ffi.Pointer<Fms2nFrameForProcess> toFms2nFrameForProcessPointer() {
-    ffi.Pointer<Fms2nFrameForProcess> pointer = ffiCreateFrameForProcessP();
-    final fms2nFrameForProcess = pointer.ref;
-    fms2nFrameForProcess.imageStructPointer =
-        image.toFms2nImageP(rotation ?? 0);
-    fms2nFrameForProcess.processArgument = processArgument!.toArgumentPointer();
-    return pointer;
-  }
-}
+
