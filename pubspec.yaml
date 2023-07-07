@@ -15,10 +15,10 @@ dependencies:
   plugin_platform_interface: ^2.0.2
   ffi: ^2.0.1
   rxdart: 0.27.5
-  camera: 0.10.0+4
-  image: 3.2.0
+  camera: ^0.10.5+2
+  image: ^4.0.17
   google_fonts: 3.0.1
-  intl: 0.17.0
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:

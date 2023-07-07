@@ -1,7 +1,6 @@
 import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'package:ffi/ffi.dart';
-import 'package:image/image.dart';
 // C function signatures
 typedef _CVersionFunc = ffi.Pointer<Utf8> Function();
 typedef _CProcessImageFunc = ffi.Void Function(
